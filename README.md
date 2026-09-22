@@ -1,36 +1,164 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Creative Dev Studio
 
-## Getting Started
+A modern personal business website and digital studio platform built with **Next.js, TypeScript, Tailwind CSS, and Supabase**.
 
-First, run the development server:
+Creative Dev Studio is designed to showcase software development and creative services including website development, game development, desktop and mobile applications, graphic design, video editing, and digital artwork.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+> **Project Status:** Frontend Prototype / In Development
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## About The Project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Creative Dev Studio** is a personal business website prototype created to present development and creative services in a modern, professional, and responsive web experience.
 
-## Learn More
+The project is being developed with a **frontend-first approach**. The initial version focuses on the website interface, responsive design, navigation, service presentation, portfolio filtering, about section, technology showcase, and contact form.
 
-To learn more about Next.js, take a look at the following resources:
+Backend functionality such as database integration, authentication, portfolio management, file uploads, and the admin dashboard will be implemented in later development phases.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Features
 
-## Deploy on Vercel
+### Landing Page
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Modern dark-themed design
+* Large hero typography
+* Gradient visual accents
+* Responsive layout
+* Call-to-action buttons
+* Smooth section navigation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Services
+
+The website showcases multiple digital services:
+
+* Website Development
+* Web Applications
+* PC Game Development
+* Mobile Game Development
+* Unity Development
+* Desktop Applications
+* Mobile Applications
+* Graphic Design
+* Video Editing
+* Digital Drawing
+* UI/UX Design
+* Branding
+* Motion Graphics
+
+### Portfolio
+
+Portfolio functionality includes:
+
+* Project cards
+* Project categories
+* Technology tags
+* Responsive project grid
+* Category filtering
+* Website projects
+* Game projects
+* Application projects
+* Graphic design projects
+* Video projects
+* Digital artwork
+
+### About
+
+The About section presents:
+
+* Studio introduction
+* Development capabilities
+* Creative capabilities
+* Development principles
+* Technologies and tools
+
+### Contact
+
+The frontend includes a contact form containing:
+
+* Name
+* Email
+* Service selection
+* Message
+* Submit button
+
+Backend form submission will be implemented in a later phase.
+
+### Responsive Design
+
+The website is designed for:
+
+* Desktop
+* Laptop
+* Tablet
+* Mobile devices
+
+---
+
+## Technology Stack
+
+| Layer           | Technology                   |
+| --------------- | ---------------------------- |
+| Frontend        | Next.js                      |
+| Language        | TypeScript                   |
+| Styling         | Tailwind CSS                 |
+| UI Icons        | Lucide React                 |
+| Backend         | Node.js / Next.js API Routes |
+| Database        | Supabase PostgreSQL          |
+| Authentication  | Custom Authentication        |
+| File Storage    | Supabase Storage             |
+| Hosting         | Vercel                       |
+| Version Control | Git / GitHub                 |
+
+---
+
+## Future Features
+
+Potential future additions include:
+
+* Admin dashboard
+* Client accounts
+* Project management
+* Portfolio CMS
+* Service management
+* Contact message management
+* Media management
+* Supabase Storage uploads
+* Project detail pages
+* Client project portals
+* Testimonials
+* Blog
+* Case studies
+* Dark/light theme support
+* Email notifications
+* Analytics
+* SEO optimization
+
+---
+
+## License
+
+This project is currently a personal business website prototype.
+
+All rights reserved unless otherwise stated.
+
+---
+
+## Author
+
+**She Mendoza**
+
+Creative Developer / Designer
+
+GitHub:
+
+https://github.com/shemendoza
+
+---
+
+## Project
+
+**Creative Dev Studio**
+
+Building websites, applications, games, graphics, videos, and digital experiences.
