@@ -18,11 +18,45 @@ const services = [
 ];
 
 export default function Contact() {
-  const [submitted, setSubmitted] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState<
+    "idle" | "sending" | "success" | "error"
+  >("idle");
+  const [submissionError, setSubmissionError] = useState("");
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    setSubmissionStatus("sending");
+    setSubmissionError("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(formData.entries())),
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          typeof result.error === "string"
+            ? result.error
+            : "We couldn't send your message. Please try again.",
+        );
+      }
+
+      form.reset();
+      setSubmissionStatus("success");
+    } catch (error) {
+      setSubmissionStatus("error");
+      setSubmissionError(
+        error instanceof Error
+          ? error.message
+          : "We couldn't send your message. Please try again.",
+      );
+    }
   };
 
   return (
@@ -141,21 +175,24 @@ export default function Contact() {
                   </span>
                 </div>
 
-                {submitted ? (
-                  <div className="flex min-h-[430px] flex-col items-center justify-center text-center">
+                {submissionStatus === "success" ? (
+                  <div
+                    className="flex min-h-[430px] flex-col items-center justify-center text-center"
+                    aria-live="polite"
+                  >
                     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#DE8A61] text-[#15162D] shadow-[0_0_70px_rgba(222,138,97,0.3)]">
                       <Check size={36} />
                     </div>
                     <h3 className="text-3xl font-normal text-white">
-                      Message ready.
+                      Message sent.
                     </h3>
                     <p className="mt-4 max-w-md text-sm leading-relaxed text-[#C5BFD0]">
-                      Thanks for reaching out. This prototype has captured your
-                      inquiry successfully.
+                      Thanks for reaching out. Your project inquiry was sent to
+                      the Akivsoft team.
                     </p>
                     <button
                       type="button"
-                      onClick={() => setSubmitted(false)}
+                      onClick={() => setSubmissionStatus("idle")}
                       className="artsy-button mt-8"
                     >
                       Send Another
@@ -163,6 +200,19 @@ export default function Contact() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
+                    <label
+                      aria-hidden="true"
+                      className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden"
+                    >
+                      Leave this field empty
+                      <input
+                        type="text"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                      />
+                    </label>
+
                     <div className="grid gap-5 sm:grid-cols-2">
                       <label className="block">
                         <span className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/40">
@@ -172,6 +222,7 @@ export default function Contact() {
                           required
                           type="text"
                           name="name"
+                          maxLength={100}
                           placeholder="Your name"
                           className="w-full rounded-2xl border border-white/10 bg-[#0D1023]/40 px-4 py-3.5 text-sm text-white outline-none transition-all placeholder:text-white/20 focus:border-[#DE8A61]/60 focus:bg-[#0D1023]/60 focus:ring-2 focus:ring-[#DE8A61]/10"
                         />
@@ -185,6 +236,7 @@ export default function Contact() {
                           required
                           type="email"
                           name="email"
+                          maxLength={254}
                           placeholder="you@example.com"
                           className="w-full rounded-2xl border border-white/10 bg-[#0D1023]/40 px-4 py-3.5 text-sm text-white outline-none transition-all placeholder:text-white/20 focus:border-[#DE8A61]/60 focus:bg-[#0D1023]/60 focus:ring-2 focus:ring-[#DE8A61]/10"
                         />
@@ -224,25 +276,49 @@ export default function Contact() {
                         required
                         name="message"
                         rows={7}
+                        maxLength={4000}
                         placeholder="Describe the scope, platform, or goals..."
                         className="w-full resize-none rounded-2xl border border-white/10 bg-[#0D1023]/40 px-4 py-3.5 text-sm leading-relaxed text-white outline-none transition-all placeholder:text-white/20 focus:border-[#DE8A61]/60 focus:bg-[#0D1023]/60 focus:ring-2 focus:ring-[#DE8A61]/10"
                       />
                     </label>
 
+                    {submissionStatus === "error" && (
+                      <p
+                        role="alert"
+                        className="rounded-xl border border-[#DE8A61]/30 bg-[#DE8A61]/[0.08] px-4 py-3 text-sm leading-relaxed text-[#F4C5A8]"
+                      >
+                        {submissionError} If this keeps happening, email{" "}
+                        <a
+                          className="underline underline-offset-4"
+                          href="mailto:akivsoft@gmail.com"
+                        >
+                          akivsoft@gmail.com
+                        </a>
+                        .
+                      </p>
+                    )}
+
                     <button
                       type="submit"
-                      className="group flex min-h-14 w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#DE8A61] to-[#F0CA77] px-6 text-sm font-normal text-[#15162D] shadow-[0_15px_45px_rgba(222,138,97,0.2)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(222,138,97,0.32)]"
+                      disabled={submissionStatus === "sending"}
+                      className="group flex min-h-14 w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#DE8A61] to-[#F0CA77] px-6 text-sm font-normal text-[#15162D] shadow-[0_15px_45px_rgba(222,138,97,0.2)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(222,138,97,0.32)] disabled:cursor-wait disabled:opacity-70"
                     >
-                      Send Message
-                      <ArrowUpRight
-                        size={18}
-                        className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                      />
+                      {submissionStatus === "sending"
+                        ? "Sending..."
+                        : "Send Message"}
+                      {submissionStatus !== "sending" && (
+                        <ArrowUpRight
+                          size={18}
+                          className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                        />
+                      )}
                     </button>
 
-                    <p className="text-center text-[10px] leading-relaxed text-white/25">
-                      This is currently a frontend prototype. Form submission
-                      will be connected to the backend and Supabase later.
+                    <p
+                      className="text-center text-[10px] leading-relaxed text-white/25"
+                      aria-live="polite"
+                    >
+                      Your message will be sent securely to akivsoft@gmail.com.
                     </p>
                   </form>
                 )}

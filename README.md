@@ -75,15 +75,18 @@ The About section presents:
 
 ### Contact
 
-The frontend includes a contact form containing:
+The contact form sends project inquiries to **akivsoft@gmail.com** through a
+server-side Gmail SMTP endpoint. Replies to an inquiry are addressed to the
+sender's email.
 
-* Name
-* Email
-* Service selection
-* Message
-* Submit button
+To enable delivery locally, copy `.env.example` to `.env.local` and set
+`GMAIL_APP_PASSWORD` to an App Password generated from the Akivsoft Google
+account. Keep the app password private; do not add it to source control or use
+a `NEXT_PUBLIC_` variable. Add both `GMAIL_USER` and `GMAIL_APP_PASSWORD` to the
+production host's server environment as well.
 
-Backend form submission will be implemented in a later phase.
+The Google account must have 2-Step Verification enabled to create an App
+Password.
 
 ### Responsive Design
 
