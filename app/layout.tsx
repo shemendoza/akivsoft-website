@@ -10,9 +10,12 @@ const ethnocentric = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Creative Dev Studio",
+  title: "Akivsoft",
   description:
-    "Websites, games, applications, graphics, videos, and digital art built with code and creativity.",
+    "Websites, unity games, applications, graphics, videos, and digital art built with code and creativity.",
+  icons: {
+    icon: "images/a-logo.png",
+  },
 };
 
 export default function RootLayout({

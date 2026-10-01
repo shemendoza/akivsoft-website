@@ -3,6 +3,7 @@
 import {
   ArrowLeft,
   ArrowRight,
+  ChevronDown,
   Gamepad2,
 } from "lucide-react";
 import {
@@ -10,12 +11,26 @@ import {
   useEffect,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
+import Image from "next/image";
+
+type PortfolioFeature = {
+  icon: string;
+  title: string;
+  description: string;
+};
 
 type PortfolioItem = {
   number: string;
   title: string;
-  technologies: string[];
+  image?: string;
+  tagline: string;
+  description: string[];
+  features: PortfolioFeature[];
+  genre: string;
+  secondaryGenres: string[];
+  availability: string;
   icon: React.ElementType;
   gradient: string;
 };
@@ -23,35 +38,142 @@ type PortfolioItem = {
 const portfolioItems: PortfolioItem[] = [
   {
     number: "01",
-    title: "Game 01",
-    technologies: [
-      "Unity",
-      "C#",
+    title: "Cosmic Dodge",
+    image: "/unity-images/1.jpeg",
+    tagline: "Dodge. Fly. Survive.",
+    description: [
+      "Take control of your astronaut and navigate through a dangerous cosmic field filled with massive asteroids and unpredictable space debris!",
+      "In Cosmic Dodge, your astronaut constantly flies upward on an endless journey. Tap and hold the screen to dive downward; release to rise again, then carefully maneuver around incoming obstacles.",
+      "Watch out for massive asteroid formations blocking your path, while smaller asteroids appear unexpectedly from different directions. Every collision costs you a life, and you have only three lives, so survive as long as possible.",
+      "The longer you survive, the more intense the challenge becomes.",
     ],
+    features: [
+      {
+        icon: "🌌",
+        title: "Endless Space Adventure",
+        description: "Fly through an ever-changing cosmic environment.",
+      },
+      {
+        icon: "☄️",
+        title: "Dodge Massive Asteroids",
+        description: "Navigate through dangerous asteroid formations.",
+      },
+      {
+        icon: "💫",
+        title: "Quick Tap Controls",
+        description: "Hold to dive and release to rise.",
+      },
+      {
+        icon: "❤️",
+        title: "Three Lives",
+        description: "Make every move count.",
+      },
+      {
+        icon: "🎮",
+        title: "Arcade-Style Gameplay",
+        description: "Easy to learn, challenging to master.",
+      },
+      {
+        icon: "🏆",
+        title: "Survive as Long as You Can",
+        description: "Push your limits and beat your best run.",
+      },
+    ],
+    genre: "Arcade",
+    secondaryGenres: [
+      "Action",
+      "Casual",
+      "Endless Runner",
+      "Survival",
+      "Space",
+    ],
+    availability: "Coming soon",
     icon: Gamepad2,
     gradient: "from-[#3B4895] to-[#DE8A61]",
   },
   {
     number: "02",
-    title: "Game 02",
-    technologies: [
-      "Unity",
-      "C#",
-    ],
+    title: "",
+    tagline: "",
+    description: [],
+    features: [],
+    genre: "",
+    secondaryGenres: [],
+    availability: "Coming soon",
     icon: Gamepad2,
     gradient: "from-[#3B4895] to-[#DE8A61]",
   },
   {
     number: "03",
-    title: "Game 03",
-    technologies: [
-      "Unity",
-      "C#",
-    ],
+    title: "",
+    tagline: "",
+    description: [],
+    features: [],
+    genre: "",
+    secondaryGenres: [],
+    availability: "Coming soon",
     icon: Gamepad2,
     gradient: "from-[#3B4895] to-[#DE8A61]",
   },
 ];
+
+function AnimatedInfoBox({
+  code,
+  label,
+  children,
+}: {
+  code: string;
+  label: string;
+  children: ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="group overflow-hidden rounded-2xl border border-[#F0CA77]/20 bg-[#15162D]/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-colors duration-300 hover:border-[#F0CA77]/45">
+      <button
+        type="button"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F0CA77]/70"
+      >
+        <span className="flex h-7 w-7 items-center justify-center rounded-md border border-[#DE8A61]/35 bg-[#DE8A61]/10 font-[var(--font-rajdhani)] text-[10px] text-[#DE8A61]">
+          {code}
+        </span>
+        <span className="flex-1 font-[var(--font-rajdhani)] text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+          {label}
+        </span>
+        <span className="font-[var(--font-rajdhani)] text-[9px] uppercase tracking-[0.14em] text-white/35">
+          {isOpen ? "Close" : "Open"}
+        </span>
+        <ChevronDown
+          size={16}
+          aria-hidden="true"
+          className={`text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+        />
+      </button>
+
+      <div
+        aria-hidden={!isOpen}
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+          isOpen ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <div
+            className={`transform border-t border-[#F0CA77]/10 px-4 py-4 transition duration-300 motion-reduce:transition-none ${
+              isOpen ? "translate-y-0" : "-translate-y-2"
+            }`}
+          >
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Portfolio() {
   const totalItems = portfolioItems.length;
@@ -541,10 +663,8 @@ export default function Portfolio() {
         <div
           className="
             relative
-            h-[510px]
+            min-h-[500px]
             w-full
-            sm:h-[540px]
-            lg:h-[560px]
           "
           style={{
             "--carousel-step":
@@ -552,11 +672,15 @@ export default function Portfolio() {
           } as React.CSSProperties}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          onClick={() => {
+            setIsManuallyPaused(true);
+            scheduleResume();
+          }}
         >
           <div
             className="
-              absolute
-              inset-0
+              relative
+              min-h-[500px]
               flex
               items-center
               justify-center
@@ -592,173 +716,159 @@ export default function Portfolio() {
 
                 if (isActive) {
                   return (
-                    <div
+                    <article
                       key={item.number}
                       className="
-                        absolute
-                        left-1/2
-                        top-1/2
-                        w-[min(88vw,520px)]
-                        -translate-x-1/2
-                        -translate-y-1/2
+                        relative
+                        z-50
+                        w-[min(92vw,780px)]
                       "
-                      style={{
-                        zIndex: 50,
-                      }}
+                      aria-label={
+                        item.title
+                          ? `${item.title} game details`
+                          : `Game ${item.number}, coming soon`
+                      }
                     >
-                      <button
-                        type="button"
-                        onClick={() =>
-                          selectCard(index)
-                        }
-                        aria-label={`${item.title}, currently selected`}
-                        aria-pressed="true"
-                        className="
-                          group
-                          relative
-                          block
-                          w-full
-                          cursor-pointer
-                          text-left
-                          outline-none
-                          focus-visible:ring-2
-                          focus-visible:ring-[#F0CA77]/70
-                          focus-visible:ring-offset-4
-                          focus-visible:ring-offset-[#15162D]
-                        "
+                      <div
+                        className={`
+                          ${item.title ? "portfolio-game-opening" : ""}
+                          rounded-[2rem]
+                          bg-gradient-to-br
+                          ${item.gradient}
+                          p-[1px]
+                          shadow-[0_30px_100px_rgba(0,0,0,0.45)]
+                        `}
                       >
-                        <div
-                          className={`
-                            relative
-                            rounded-[2rem]
-                            bg-gradient-to-br
-                            ${item.gradient}
-                            p-[1px]
-                            shadow-[0_30px_100px_rgba(0,0,0,0.45)]
-                            transition-transform
-                            duration-500
-                            group-hover:-translate-y-2
-                            group-focus-visible:-translate-y-2
-                          `}
-                        >
-                          <div
-                            className="
-                              relative
-                              min-h-[410px]
-                              overflow-hidden
-                              rounded-[2rem]
-                              bg-[#111225]
-                              p-7
-                              sm:p-9
-                            "
-                          >
-                            <div
-                              className={`
-                                pointer-events-none
-                                absolute
-                                -right-20
-                                -top-20
-                                h-48
-                                w-48
-                                rounded-full
-                                bg-gradient-to-br
-                                ${item.gradient}
-                                opacity-20
-                                blur-3xl
-                              `}
-                            />
+                        {item.title ? (
+                          <div className="portfolio-game-content-reveal relative overflow-hidden rounded-[2rem] bg-[#111225] p-5 sm:p-8">
+                            <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#3B4895]/20 blur-[100px]" />
+                            <div className="pointer-events-none absolute -bottom-32 -left-28 h-72 w-72 rounded-full bg-[#DE8A61]/10 blur-[100px]" />
 
-                            <div
-                              className="
-                                relative
-                                mb-8
-                                flex
-                                items-start
-                                justify-between
-                              "
-                            >
-                              <div
-                                className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg`}
-                              >
-                                <item.icon size={22} className="text-[#15162D]" />
+                            <div className="relative grid items-center gap-4 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A61]/15 p-5 sm:grid-cols-[1fr_auto] sm:p-7">
+                              <div className="relative z-10">
+                                <div className="mb-6 flex flex-wrap items-center gap-3">
+                                  <span className="font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.24em] text-white/55">
+                                    Game {item.number}
+                                  </span>
+                                  <span className="inline-flex items-center gap-2 rounded-full bg-[#F0CA77]/10 px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.16em] text-[#F0CA77]">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-[#F0CA77] shadow-[0_0_10px_#F0CA77]" />
+                                    {item.availability}
+                                  </span>
+                                </div>
+
+                                <h3 className="font-ethnocentric text-3xl font-normal uppercase leading-tight tracking-[-0.04em] text-white sm:text-4xl md:text-5xl">
+                                  {item.title}
+                                </h3>
+                                <p className="mt-3 font-[var(--font-rajdhani)] text-lg font-semibold uppercase tracking-[0.2em] text-[#F0CA77] sm:text-xl">
+                                  {item.tagline}
+                                </p>
                               </div>
+
+                              {item.image && (
+                                <div className="relative mx-auto h-44 w-44 sm:h-56 sm:w-56">
+                                  <Image
+                                    src={item.image}
+                                    alt="Cosmic Dodge character artwork"
+                                    width={300}
+                                    height={300}
+                                    sizes="(min-width: 768px) 224px, 176px"
+                                    className="h-full w-full object-contain drop-shadow-[0_18px_28px_rgba(0,0,0,0.35)]"
+                                  />
+                                </div>
+                              )}
                             </div>
 
-                            <div className="relative">
-                              <h3
-                                className="
-                                  font-ethnocentric
-                                  text-3xl
-                                  font-normal
-                                  uppercase
-                                  leading-none
-                                  tracking-[-0.04em]
-                                  text-white
-                                  sm:text-4xl
-                                "
-                              >
-                                {item.title}
-                              </h3>
+                            <section className="relative mt-7">
+                              <h4 className="mb-3 font-[var(--font-rajdhani)] text-xs font-semibold uppercase tracking-[0.26em] text-[#DE8A61]">
+                                Description
+                              </h4>
+                              <div className="space-y-4 text-sm leading-relaxed text-[#D8D3E1] sm:text-base">
+                                {item.description.map((paragraph) => (
+                                  <p key={paragraph}>{paragraph}</p>
+                                ))}
+                              </div>
+                            </section>
 
-                              <div
-                                className="
-                                  mt-5
-                                  h-[2px]
-                                  w-14
-                                  bg-gradient-to-r
-                                  from-[#DE8A61]
-                                  to-[#F0CA77]
-                                "
-                              />
+                            <section className="relative mt-8">
+                              <div className="mb-4 flex items-end justify-between gap-4">
+                                <div>
+                                  <p className="font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.28em] text-[#DE8A61]">
+                                    What awaits
+                                  </p>
+                                  <h4 className="mt-1 font-ethnocentric text-lg font-normal uppercase tracking-[0.02em] text-white sm:text-xl">
+                                    Features
+                                  </h4>
+                                </div>
+                                <Gamepad2 className="mb-1 text-white/25" size={22} aria-hidden="true" />
+                              </div>
 
-                              <div className="mt-7 flex flex-wrap gap-2">
-                                {item.technologies.map(
-                                  (technology) => (
-                                    <span
-                                      key={technology}
-                                      className="
-                                        rounded-full
-                                        bg-white/[0.04]
-                                        px-3
-                                        py-1.5
-                                        font-[var(--font-rajdhani)]
-                                        text-[10px]
-                                        font-normal
-                                        uppercase
-                                        tracking-[0.12em]
-                                        text-white/45
-                                      "
-                                    >
-                                      {technology}
+                              <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                                {item.features.map((feature) => (
+                                  <li key={feature.title} className="flex items-start gap-3">
+                                    <span className="mt-0.5 text-lg" aria-hidden="true">
+                                      {feature.icon}
                                     </span>
-                                  ),
-                                )}
-                              </div>
+                                    <p className="text-sm leading-relaxed text-white/55">
+                                      <strong className="font-semibold text-white/90">
+                                        {feature.title}
+                                      </strong>{" "}
+                                      <span>— {feature.description}</span>
+                                    </p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </section>
 
-                              <div
-                                className="
-                                  mt-8
-                                  flex
-                                  items-center
-                                  gap-3
-                                  font-[var(--font-rajdhani)]
-                                  text-xs
-                                  font-normal
-                                  uppercase
-                                  tracking-[0.2em]
-                                  text-white/60
-                                  transition-colors
-                                  duration-300
-                                  group-hover:text-[#F0CA77]
-                                "
-                              >
-                                Coming soon
-                              </div>
+                            <div className="relative mt-8 grid gap-3 sm:grid-cols-2">
+                              <AnimatedInfoBox code="01" label="Genre">
+                                <p className="font-ethnocentric text-lg font-normal uppercase text-[#F0CA77]">
+                                  {item.genre}
+                                </p>
+                              </AnimatedInfoBox>
+
+                              <AnimatedInfoBox code="02" label="Secondary">
+                                <div className="flex flex-wrap gap-2">
+                                  {item.secondaryGenres.map((genre) => (
+                                    <span
+                                      key={genre}
+                                      className="rounded-full bg-white/[0.07] px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.12em] text-white/75"
+                                    >
+                                      {genre}
+                                    </span>
+                                  ))}
+                                </div>
+                              </AnimatedInfoBox>
+                            </div>
+
+                            <div className="relative mt-8 space-y-2 text-center">
+                              <p className="font-[var(--font-rajdhani)] text-lg font-semibold text-[#F0CA77] sm:text-xl">
+                                How long can you survive the cosmic chaos?
+                              </p>
+                              <p className="font-[var(--font-rajdhani)] text-sm uppercase tracking-[0.12em] text-white/60 sm:text-base">
+                                Enter the void. Take flight. Dodge everything.
+                              </p>
+                              <p className="pt-3 font-ethnocentric text-xs font-normal uppercase tracking-[0.18em] text-white/75 sm:text-sm">
+                                Cosmic Dodge
+                              </p>
+                              <p className="font-[var(--font-rajdhani)] text-sm font-semibold uppercase tracking-[0.18em] text-[#DE8A61]">
+                                How long can you stay alive?
+                              </p>
                             </div>
                           </div>
-                        </div>
-                      </button>
-                    </div>
+                        ) : (
+                          <div className="relative flex min-h-[340px] flex-col items-center justify-center overflow-hidden rounded-[2rem] bg-[#111225] p-8 text-center sm:min-h-[400px]">
+                            <div className="pointer-events-none absolute h-64 w-64 rounded-full border border-[#F0CA77]/10" />
+                            <div className="pointer-events-none absolute h-48 w-48 rounded-full border border-[#DE8A61]/15" />
+                            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3B4895] to-[#DE8A61] shadow-[0_0_50px_rgba(59,72,149,0.3)]">
+                              <item.icon size={28} className="text-[#15162D]" aria-hidden="true" />
+                            </div>
+                            <p className="relative mt-3 font-ethnocentric text-xl font-normal uppercase tracking-[0.04em] text-[#F0CA77] sm:text-2xl">
+                              {item.availability}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </article>
                   );
                 }
 
@@ -831,7 +941,7 @@ export default function Portfolio() {
                       onClick={() =>
                         selectCard(index)
                       }
-                      aria-label={`Select ${item.title}`}
+                      aria-label={`Select ${item.title || `game ${item.number}`}`}
                       className="
                         group
                         block
@@ -885,22 +995,28 @@ export default function Portfolio() {
                           </div>
 
                           <div className="relative mt-12">
-                            <h3
-                              className="
-                                font-ethnocentric
-                                text-2xl
-                                font-normal
-                                uppercase
-                                tracking-[-0.04em]
-                                text-white/90
-                              "
-                            >
-                              {item.title}
-                            </h3>
+                            {item.title && (
+                              <h3
+                                className="
+                                  font-ethnocentric
+                                  text-2xl
+                                  font-normal
+                                  uppercase
+                                  tracking-[-0.04em]
+                                  text-white/90
+                                "
+                              >
+                                {item.title}
+                              </h3>
+                            )}
+
+                            <p className="mt-5 font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.2em] text-[#F0CA77]/70">
+                              {item.availability}
+                            </p>
 
                             <div
                               className="
-                                mt-5
+                                mt-3
                                 flex
                                 items-center
                                 gap-2
@@ -981,7 +1097,9 @@ export default function Portfolio() {
                     onClick={() =>
                       selectCard(index)
                     }
-                    aria-label={`Go to ${item.title}`}
+                    aria-label={`Go to game ${item.number}${
+                      item.title ? `: ${item.title}` : " (coming soon)"
+                    }`}
                     aria-current={
                       index === activeIndex
                         ? "true"
