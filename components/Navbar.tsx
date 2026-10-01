@@ -1,9 +1,8 @@
-
 "use client";
 
 import Image from "next/image";
 import { ArrowUpRight, Menu, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const links = [
   { label: "Home", href: "#home" },
@@ -15,6 +14,39 @@ const links = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [activeHref, setActiveHref] = useState("#home");
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const sections = links
+      .map(({ href }) => document.getElementById(href.slice(1)))
+      .filter((section): section is HTMLElement => section !== null);
+
+    const updateNavbar = () => {
+      const marker = window.innerHeight * 0.34;
+      let currentSection = sections[0]?.id ?? "home";
+
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= marker) {
+          currentSection = section.id;
+        } else {
+          break;
+        }
+      }
+
+      setActiveHref(`#${currentSection}`);
+      setScrolled(window.scrollY > 24);
+    };
+
+    updateNavbar();
+    window.addEventListener("scroll", updateNavbar, { passive: true });
+    window.addEventListener("resize", updateNavbar);
+
+    return () => {
+      window.removeEventListener("scroll", updateNavbar);
+      window.removeEventListener("resize", updateNavbar);
+    };
+  }, []);
 
   const closeMenu = () => {
     setOpen(false);
@@ -22,7 +54,19 @@ export default function Navbar() {
 
   return (
     <header className="fixed left-0 top-0 z-50 w-full">
-      <nav className="relative w-full px-5 py-4 sm:px-8 sm:py-5 lg:px-10 lg:py-5 xl:px-14 2xl:px-20">
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-0 h-64 backdrop-blur-[2px] transition-opacity duration-500 ${
+          scrolled
+            ? "bg-[linear-gradient(to_bottom,rgba(21,22,45,0.94)_0%,rgba(21,22,45,0.72)_35%,rgba(21,22,45,0.32)_70%,transparent_100%)] opacity-100"
+            : "opacity-0"
+        }`}
+        style={{
+          maskImage: "linear-gradient(to bottom, black 0%, black 25%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 25%, transparent 100%)",
+        }}
+      />
+      <nav className="relative z-10 w-full px-5 py-4 sm:px-8 sm:py-5 lg:px-10 lg:py-5 xl:px-14 2xl:px-20">
         <div className="relative flex w-full items-center justify-between">
 
           {/* =========================================================
@@ -48,7 +92,7 @@ export default function Navbar() {
               width={8400}
               height={1103}
               priority
-              className="h-auto w-[170px] object-contain sm:w-[210px] lg:w-[235px] xl:w-[290px] 2xl:w-[330px]"
+              className="h-auto w-[170px] object-contain sm:w-[210px] lg:w-[235px] xl:w-[290px] 2xl:w-[330px] max-[380px]:hidden"
             />
           </a>
 
@@ -63,28 +107,31 @@ export default function Navbar() {
             className="
               absolute left-1/2 z-20 hidden
               -translate-x-1/2
-              lg:block
+              min-[1900px]:flex
             "
           >
             <div
-              className="
+              className={`
                 flex items-center
                 gap-2
                 rounded-full
-                bg-[#15162D]/55
                 px-2
                 py-2
-                shadow-[0_12px_45px_rgba(0,0,0,0.25)]
-                backdrop-blur-xl
+                transition-all duration-500
                 xl:gap-3
                 2xl:gap-4
-              "
+                ${scrolled ? "bg-[#15162D]/20 shadow-none backdrop-blur-sm" : "bg-[#15162D]/55 shadow-[0_12px_45px_rgba(0,0,0,0.25)] backdrop-blur-xl"}
+              `}
             >
-              {links.map((link) => (
-                <a
-                  key={`${link.label}-${link.href}`}
-                  href={link.href}
-                  className="
+              {links.map((link) => {
+                const isActive = activeHref === link.href;
+
+                return (
+                  <a
+                    key={`${link.label}-${link.href}`}
+                    href={link.href}
+                    aria-current={isActive ? "location" : undefined}
+                    className={`
                     group relative
                     flex min-h-11 items-center justify-center
                     whitespace-nowrap
@@ -94,7 +141,6 @@ export default function Navbar() {
                     text-[1rem]
                     font-normal
                     tracking-wide
-                    text-white/80
                     transition-all duration-300
                     hover:bg-white/[0.08]
                     hover:text-white
@@ -103,15 +149,15 @@ export default function Navbar() {
                     xl:text-[1.05rem]
                     2xl:px-6
                     2xl:text-[1.1rem]
-                  "
-                >
-                  {link.label}
+                    ${isActive ? "bg-white/[0.06] text-[#F0CA77]" : "text-white/80"}
+                  `}
+                  >
+                    {link.label}
 
-                  {/* Hover underline */}
-                  <span
-                    className="
+                    <span
+                      className={`
                       absolute bottom-1.5 left-1/2
-                      h-[2px] w-0
+                      h-[2px]
                       -translate-x-1/2
                       rounded-full
                       bg-gradient-to-r
@@ -119,13 +165,12 @@ export default function Navbar() {
                       via-[#F0CA77]
                       to-white
                       transition-all duration-300
-                      group-hover:w-1/2
-                    "
-                  />
+                      ${isActive ? "w-1/2" : "w-0 group-hover:w-1/2"}
+                    `}
+                    />
 
-                  {/* Small glow behind active hover */}
-                  <span
-                    className="
+                    <span
+                      className="
                       pointer-events-none
                       absolute inset-0 -z-10
                       rounded-full
@@ -141,9 +186,10 @@ export default function Navbar() {
                       group-hover:to-[#DE8A61]/10
                       group-hover:opacity-100
                     "
-                  />
-                </a>
-              ))}
+                    />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -170,7 +216,7 @@ export default function Navbar() {
               transition-all duration-300
               hover:-translate-y-1
               hover:shadow-[0_16px_50px_rgba(222,138,97,0.35)]
-              lg:flex
+              min-[1900px]:flex
               xl:min-h-14
               xl:px-7
               xl:text-[1.05rem]
@@ -199,19 +245,18 @@ export default function Navbar() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((current) => !current)}
-            className="
+            className={`
               relative z-30
               flex h-12 w-12
               items-center justify-center
               rounded-full
-              border border-white/10
-              bg-white/[0.06]
               text-white
               transition-all duration-300
               hover:border-[#DE8A61]/50
               hover:bg-[#DE8A61]/20
-              lg:hidden
-            "
+              min-[1900px]:hidden
+              ${scrolled ? "border border-white/5 bg-white/[0.025]" : "border border-white/10 bg-white/[0.06]"}
+            `}
           >
             {open ? <X size={23} /> : <Menu size={23} />}
           </button>
@@ -224,7 +269,7 @@ export default function Navbar() {
       {open && (
         <div
           className="
-            relative mx-4
+            relative z-20 mx-4
             overflow-hidden
             rounded-3xl
             border border-[#F0CA77]/10
@@ -233,7 +278,7 @@ export default function Navbar() {
             shadow-[0_25px_80px_rgba(13,16,35,0.45)]
             backdrop-blur-2xl
             sm:mx-6
-            lg:hidden
+            min-[1900px]:hidden
           "
         >
           <div
@@ -248,12 +293,16 @@ export default function Navbar() {
           />
 
           <div className="relative flex flex-col">
-            {links.map((link) => (
-              <a
-                key={`${link.label}-${link.href}`}
-                href={link.href}
-                onClick={closeMenu}
-                className="
+            {links.map((link) => {
+              const isActive = activeHref === link.href;
+
+              return (
+                <a
+                  key={`${link.label}-${link.href}`}
+                  href={link.href}
+                  onClick={closeMenu}
+                  aria-current={isActive ? "location" : undefined}
+                  className={`
                   group flex items-center justify-between
                   border-b border-white/[0.07]
                   px-2 py-5
@@ -261,25 +310,27 @@ export default function Navbar() {
                   text-lg
                   font-normal
                   tracking-wide
-                  text-white/80
                   transition-colors duration-300
                   hover:text-white
-                "
-              >
-                {link.label}
+                  ${isActive ? "text-[#F0CA77]" : "text-white/80"}
+                `}
+                >
+                  {link.label}
 
-                <ArrowUpRight
-                  size={18}
-                  className="
+                  <ArrowUpRight
+                    size={18}
+                    className={`
                     text-white/25
                     transition-all duration-300
                     group-hover:-translate-y-0.5
                     group-hover:translate-x-0.5
                     group-hover:text-[#F0CA77]
-                  "
-                />
-              </a>
-            ))}
+                      ${isActive ? "text-[#F0CA77]" : ""}
+                    `}
+                  />
+                </a>
+              );
+            })}
 
             <a
               href="#contact"

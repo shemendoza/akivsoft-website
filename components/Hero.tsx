@@ -3,17 +3,251 @@ import {
   ArrowUpRight,
   Sparkles,
 } from "lucide-react";
+import type { CSSProperties } from "react";
+
+type LeafShape = "maple" | "oak" | "ginkgo" | "serrated";
+
+type AutumnLeaf = {
+  shape: LeafShape;
+  left: string;
+  size: number;
+  duration: string;
+  delay: string;
+  color: string;
+  opacity: number;
+  mid: string;
+  late: string;
+  end: string;
+  turn: string;
+};
+
+const autumnLeaves: AutumnLeaf[] = [
+  {
+    shape: "maple",
+    left: "4%",
+    size: 31,
+    duration: "24s",
+    delay: "-16s",
+    color: "#DE8A61",
+    opacity: 0.58,
+    mid: "8vw",
+    late: "-3vw",
+    end: "5vw",
+    turn: "520deg",
+  },
+  {
+    shape: "ginkgo",
+    left: "12%",
+    size: 42,
+    duration: "29s",
+    delay: "-7s",
+    color: "#F0CA77",
+    opacity: 0.48,
+    mid: "-6vw",
+    late: "7vw",
+    end: "-4vw",
+    turn: "610deg",
+  },
+  {
+    shape: "oak",
+    left: "20%",
+    size: 26,
+    duration: "21s",
+    delay: "-18s",
+    color: "#934C60",
+    opacity: 0.62,
+    mid: "5vw",
+    late: "-7vw",
+    end: "3vw",
+    turn: "460deg",
+  },
+  {
+    shape: "serrated",
+    left: "29%",
+    size: 36,
+    duration: "27s",
+    delay: "-11s",
+    color: "#DE8A61",
+    opacity: 0.5,
+    mid: "-8vw",
+    late: "4vw",
+    end: "-6vw",
+    turn: "570deg",
+  },
+  {
+    shape: "maple",
+    left: "37%",
+    size: 29,
+    duration: "23s",
+    delay: "-4s",
+    color: "#F0CA77",
+    opacity: 0.56,
+    mid: "6vw",
+    late: "-5vw",
+    end: "7vw",
+    turn: "500deg",
+  },
+  {
+    shape: "oak",
+    left: "46%",
+    size: 45,
+    duration: "30s",
+    delay: "-22s",
+    color: "#71527B",
+    opacity: 0.55,
+    mid: "-5vw",
+    late: "8vw",
+    end: "-7vw",
+    turn: "630deg",
+  },
+  {
+    shape: "ginkgo",
+    left: "55%",
+    size: 30,
+    duration: "25s",
+    delay: "-13s",
+    color: "#DE8A61",
+    opacity: 0.62,
+    mid: "9vw",
+    late: "-6vw",
+    end: "4vw",
+    turn: "540deg",
+  },
+  {
+    shape: "serrated",
+    left: "63%",
+    size: 38,
+    duration: "28s",
+    delay: "-8s",
+    color: "#F0CA77",
+    opacity: 0.48,
+    mid: "-7vw",
+    late: "5vw",
+    end: "-5vw",
+    turn: "590deg",
+  },
+  {
+    shape: "oak",
+    left: "71%",
+    size: 27,
+    duration: "22s",
+    delay: "-19s",
+    color: "#934C60",
+    opacity: 0.6,
+    mid: "6vw",
+    late: "-8vw",
+    end: "6vw",
+    turn: "470deg",
+  },
+  {
+    shape: "maple",
+    left: "79%",
+    size: 43,
+    duration: "30s",
+    delay: "-5s",
+    color: "#DE8A61",
+    opacity: 0.52,
+    mid: "-9vw",
+    late: "6vw",
+    end: "-3vw",
+    turn: "620deg",
+  },
+  {
+    shape: "ginkgo",
+    left: "87%",
+    size: 32,
+    duration: "24s",
+    delay: "-15s",
+    color: "#F0CA77",
+    opacity: 0.58,
+    mid: "5vw",
+    late: "-4vw",
+    end: "8vw",
+    turn: "530deg",
+  },
+  {
+    shape: "serrated",
+    left: "95%",
+    size: 26,
+    duration: "21s",
+    delay: "-10s",
+    color: "#71527B",
+    opacity: 0.56,
+    mid: "-6vw",
+    late: "7vw",
+    end: "-5vw",
+    turn: "490deg",
+  },
+];
+
+type FallingLeafStyle = CSSProperties & {
+  "--leaf-drift-mid": string;
+  "--leaf-drift-late": string;
+  "--leaf-drift-end": string;
+  "--leaf-turn": string;
+  "--leaf-opacity": number;
+};
+
+const leafArtwork: Record<LeafShape, { outline: string; veins: string[] }> = {
+  maple: {
+    outline:
+      "m24 2 4 8 6-4 1 9 9-1-6 7 7 5-9 2 4 8-9-2-1 9-6-7-6 7-1-9-9 2 4-8-9-2 7-5-6-7 9 1 1-9 6 4 4-8Z",
+    veins: ["M24 22 25 44", "m24 31-8-7", "m25 27 8-8"],
+  },
+  oak: {
+    outline:
+      "M24 3c-4 5-9 3-10 9-7-1-10 4-5 9-6 5-3 11 5 11-1 7 4 9 9 5 0 5 1 8 1 8s1-3 1-8c5 4 10 2 9-5 8 0 11-6 5-11 5-5 2-10-5-9-1-6-6-4-10-9Z",
+    veins: ["M24 26v19", "m24 33-9-9", "m24 29 9-9", "m24 37 8-3"],
+  },
+  ginkgo: {
+    outline:
+      "M24 44C20 36 7 35 7 23C7 13 13 5 23 3C21 11 22 18 24 23C26 18 27 11 25 3C35 5 41 13 41 23C41 35 28 36 24 44Z",
+    veins: [
+      "M24 43 9 24",
+      "M24 43 12 16",
+      "M24 43 20 9",
+      "M24 43 28 9",
+      "M24 43 36 16",
+      "M24 43 39 24",
+    ],
+  },
+  serrated: {
+    outline:
+      "M24 2 27 8 32 6 31 12 37 12 35 18 41 21 36 25 40 30 34 32 36 38 30 37 27 43 24 46 21 43 18 37 12 38 14 32 8 30 12 25 7 21 13 18 11 12 17 12 16 6 21 8Z",
+    veins: ["M24 24v21", "M24 32 15 18", "M24 29 33 15", "m24 37 8-3"],
+  },
+};
+
+function LeafSilhouette({ shape }: { shape: LeafShape }) {
+  const artwork = leafArtwork[shape];
+
+  return (
+    <>
+      <path d={artwork.outline} fill="currentColor" />
+      <g
+        stroke="#15162D"
+        strokeOpacity=".45"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      >
+        {artwork.veins.map((vein) => (
+          <path key={vein} d={vein} />
+        ))}
+      </g>
+    </>
+  );
+}
 
 export default function Hero() {
   return (
     <section
       id="home"
       className="
-        artsy-background
         relative
         isolate
         min-h-screen
         overflow-hidden
+        bg-[#15162D]
       "
     >
       {/* =====================================================
@@ -69,6 +303,92 @@ export default function Hero() {
       />
 
       {/* =====================================================
+          FALLING AUTUMN SILHOUETTES
+          ===================================================== */}
+
+      <div
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        {autumnLeaves.map((leaf, index) => (
+          <svg
+            key={`${leaf.left}-${index}`}
+            viewBox="0 0 48 48"
+            fill="none"
+            className="falling-leaf"
+            style={{
+              left: leaf.left,
+              width: `${leaf.size}px`,
+              height: `${leaf.size}px`,
+              animationDuration: leaf.duration,
+              animationDelay: leaf.delay,
+              color: leaf.color,
+              "--leaf-drift-mid": leaf.mid,
+              "--leaf-drift-late": leaf.late,
+              "--leaf-drift-end": leaf.end,
+              "--leaf-turn": leaf.turn,
+              "--leaf-opacity": leaf.opacity,
+            } as FallingLeafStyle}
+          >
+            <LeafSilhouette shape={leaf.shape} />
+          </svg>
+        ))}
+      </div>
+
+      {/* =====================================================
+          AUTUMN LAND LAYERS
+          ===================================================== */}
+
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[42vh] min-h-[240px] max-h-[440px] bg-transparent opacity-[0.42]"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 1600 520"
+          preserveAspectRatio="none"
+          className="h-full w-full"
+          fill="none"
+        >
+          <defs>
+            <linearGradient
+              id="distant-landscape"
+              gradientUnits="userSpaceOnUse"
+              x1="0"
+              y1="130"
+              x2="0"
+              y2="500"
+            >
+              <stop offset="0%" stopColor="#626CC2" stopOpacity="0" />
+              <stop offset="30%" stopColor="#626CC2" stopOpacity="0.04" />
+              <stop offset="58%" stopColor="#626CC2" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#626CC2" stopOpacity="0.58" />
+            </linearGradient>
+            <linearGradient
+              id="foreground-landscape"
+              gradientUnits="userSpaceOnUse"
+              x1="0"
+              y1="310"
+              x2="0"
+              y2="520"
+            >
+              <stop offset="0%" stopColor="#34395F" stopOpacity="0" />
+              <stop offset="18%" stopColor="#34395F" stopOpacity="0.12" />
+              <stop offset="48%" stopColor="#34395F" stopOpacity="0.52" />
+              <stop offset="100%" stopColor="#34395F" stopOpacity="0.96" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0 352c154-67 288-32 431-79 182-59 299 4 454-33 217-51 393 7 715-88v368H0V352Z"
+            fill="url(#distant-landscape)"
+          />
+          <path
+            d="M0 407c177-75 329-49 475-18 175 38 312-49 479-54 207-7 357 59 646-35v220H0V407Z"
+            fill="url(#foreground-landscape)"
+          />
+        </svg>
+      </div>
+
+      {/* =====================================================
           ART GRID
           ===================================================== */}
 
@@ -102,6 +422,11 @@ export default function Hero() {
           style={{ animation: "none" }}
         />
       </div>
+
+      <div
+        className="artsy-background pointer-events-none absolute inset-0 z-[1] opacity-[0.28]"
+        aria-hidden="true"
+      />
 
       {/* =====================================================
           HERO CONTENT
@@ -228,8 +553,8 @@ export default function Hero() {
 
             <div className="relative hidden lg:block">
               <div className="relative ml-auto max-w-[500px]">
-                <div className="absolute -inset-12 rounded-full border border-[#F0CA77]/10" />
-                <div className="absolute -inset-6 rounded-full border border-[#DE8A61]/10" />
+                <div className="hero-orbit-ring hero-orbit-ring--code rounded-full border border-[#F0CA77]/10" />
+                <div className="hero-orbit-ring hero-orbit-ring--art rounded-full border border-[#DE8A61]/10" />
                 <div
                   className="
                     relative
@@ -323,58 +648,26 @@ export default function Hero() {
                   </div>
                 </div>
 
-                <div
-                  className="
-                    absolute
-                    -left-8
-                    top-[18%]
-                    rounded-full
-                    border
-                    border-white/10
-                    bg-[#15162D]/60
-                    px-4
-                    py-2
-                    backdrop-blur-md
-                  "
-                >
-                  <span
-                    className="
-                      font-rajdhani
-                      text-xs
-                      uppercase
-                      tracking-[0.2em]
-                      text-white/60
-                    "
-                  >
-                    Code
-                  </span>
+                <div className="hero-orbit hero-orbit--code" aria-hidden="true">
+                  <div className="hero-orbit-planet">
+                    <span className="hero-orbit-badge inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#15162D]/60 backdrop-blur-md">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#5362B7] shadow-[0_0_12px_2px_rgba(83,98,183,0.75)]" />
+                      <span className="font-rajdhani text-xs uppercase tracking-[0.2em] text-white/70">
+                        Code
+                      </span>
+                    </span>
+                  </div>
                 </div>
 
-                <div
-                  className="
-                    absolute
-                    -right-8
-                    bottom-[22%]
-                    rounded-full
-                    border
-                    border-white/10
-                    bg-[#15162D]/60
-                    px-4
-                    py-2
-                    backdrop-blur-md
-                  "
-                >
-                  <span
-                    className="
-                      font-rajdhani
-                      text-xs
-                      uppercase
-                      tracking-[0.2em]
-                      text-white/60
-                    "
-                  >
-                    Art
-                  </span>
+                <div className="hero-orbit hero-orbit--art" aria-hidden="true">
+                  <div className="hero-orbit-planet">
+                    <span className="hero-orbit-badge inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#15162D]/60 backdrop-blur-md">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#DE8A61] shadow-[0_0_12px_2px_rgba(222,138,97,0.75)]" />
+                      <span className="font-rajdhani text-xs uppercase tracking-[0.2em] text-white/70">
+                        Art
+                      </span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

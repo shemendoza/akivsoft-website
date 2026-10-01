@@ -270,6 +270,126 @@ section::before {
   background: none;
 }
 
+#home::before {
+  content: none;
+  background: none;
+}
+
+.falling-leaf {
+  position: absolute;
+  top: -12vh;
+  display: block;
+  overflow: visible;
+  opacity: var(--leaf-opacity, 0.5);
+  filter: drop-shadow(0 5px 8px rgba(13, 16, 35, 0.28));
+  animation-name: autumn-leaf-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes autumn-leaf-fall {
+  0% {
+    transform: translate3d(0, -14vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: var(--leaf-opacity, 0.5);
+  }
+
+  36% {
+    transform: translate3d(var(--leaf-drift-mid), 36vh, 0) rotate(170deg);
+  }
+
+  68% {
+    transform: translate3d(var(--leaf-drift-late), 72vh, 0) rotate(350deg);
+  }
+
+  100% {
+    transform: translate3d(var(--leaf-drift-end), 112vh, 0)
+      rotate(var(--leaf-turn, 540deg));
+    opacity: 0;
+  }
+}
+
+.hero-orbit {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hero-orbit-ring {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.hero-orbit-ring--code,
+.hero-orbit--code {
+  inset: clamp(-35px, calc(44.8px - 4.75vw), -16px);
+}
+
+.hero-orbit--code {
+  animation: hero-orbit-clockwise 30s linear infinite;
+}
+
+.hero-orbit-ring--art,
+.hero-orbit--art {
+  inset: clamp(-24px, calc(43.2px - 4vw), -8px);
+}
+
+.hero-orbit--art {
+  animation: hero-orbit-counterclockwise 38s linear infinite;
+}
+
+.hero-orbit-badge {
+  padding: 0.375rem 0.625rem;
+  white-space: nowrap;
+}
+
+.hero-orbit-planet {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: hero-orbit-label-counterclockwise 30s linear infinite;
+  will-change: transform;
+}
+
+.hero-orbit--art .hero-orbit-planet {
+  top: 50%;
+  right: 0;
+  left: auto;
+  transform: translate(50%, -50%);
+  animation: hero-orbit-label-clockwise 38s linear infinite;
+}
+
+@keyframes hero-orbit-clockwise {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-orbit-counterclockwise {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes hero-orbit-label-counterclockwise {
+  to {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+@keyframes hero-orbit-label-clockwise {
+  to {
+    transform: translate(50%, -50%) rotate(360deg);
+  }
+}
+
 .section-container {
   width: 100%;
   padding-inline: 24px;
@@ -1012,6 +1132,17 @@ section::before {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .falling-leaf {
+    animation: none;
+    opacity: var(--leaf-opacity, 0.5);
+    transform: translate3d(0, 30vh, 0) rotate(35deg);
+  }
+
+  .hero-orbit,
+  .hero-orbit-planet {
+    animation: none !important;
   }
 }
 
