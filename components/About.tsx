@@ -48,7 +48,7 @@ export default function About() {
           <div>
             <div className="mb-5 flex items-center gap-3">
               <span className="pixel-dot" />
-              <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-sm">
+              <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-sm">
                 About Akivsoft
               </p>
             </div>
@@ -65,18 +65,18 @@ export default function About() {
           <div className="relative hidden xl:block xl:pl-8">
             <div className="relative">
               <div className="mb-8 flex items-center justify-between">
-                <span className="font-mono text-[10px] font-normal uppercase tracking-[0.2em] text-white/40">
+                <span className="font-mono text-[10px] font-normal  tracking-[0.2em] text-white/40">
                   Studio profile / 004
                 </span>
                 <Gamepad2 size={19} className="text-[#DE8A61]" />
               </div>
 
               <p className="font-ethnocentric text-6xl font-normal tracking-[-0.08em] text-white sm:text-7xl">
-                <span className="gradient-text">AKIV</span>
+                <span className="gradient-text">Akiv</span>
                 <span className="text-white/45">soft</span>
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-2 font-mono text-[9px] font-normal uppercase tracking-[0.16em] text-white/45">
+              <div className="mt-8 flex flex-wrap gap-2 font-mono text-[9px] font-normal  tracking-[0.16em] text-white/45">
                 <span className="text-[#DE8A61]">Art</span>
                 <span className="text-[#F0CA77]">Ideas</span>
                 <span className="text-[#A995D7]">Games</span>
@@ -89,12 +89,12 @@ export default function About() {
           <div>
             <div className="mb-5 flex items-center gap-3">
               <span className="pixel-dot" />
-              <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-sm">
+              <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-sm">
                 Who We Are
               </p>
             </div>
 
-            <h3 className="font-ethnocentric text-3xl font-normal uppercase leading-tight tracking-[-0.05em] text-white sm:text-4xl">
+            <h3 className="font-ethnocentric text-3xl font-normal  leading-tight tracking-[-0.05em] text-white sm:text-4xl">
               A studio built
               <br />
               around play.
@@ -115,12 +115,12 @@ export default function About() {
               <div className="mb-6 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="pixel-dot" />
-                  <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#F0CA77]/80">
+                  <span className="font-mono text-[9px]  tracking-[0.24em] text-[#F0CA77]/80">
                     Studio notes
                   </span>
                 </div>
                 <span className="font-mono text-[9px] tracking-[0.18em] text-white/30">
-                  AKV / 001
+                  Akiv / 001
                 </span>
               </div>
 
@@ -145,13 +145,13 @@ export default function About() {
             <div>
               <div className="mb-5 flex items-center gap-3">
                 <Sparkles size={15} className="text-[#DE8A61]" />
-                <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-sm">
+                <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-sm">
                   Principles we work by
                 </p>
               </div>
 
               <h3 id="akiv-values-title" className="section-title">
-                What AKIV
+                What Akiv
                 <br />
                 <span className="gradient-text">means.</span>
               </h3>
@@ -176,7 +176,7 @@ export default function About() {
                     </span>
                   </div>
 
-                  <h4 className="mb-3 font-ethnocentric text-lg font-normal uppercase tracking-[-0.03em] text-white sm:text-xl">
+                  <h4 className="mb-3 font-ethnocentric text-lg font-normal  tracking-[-0.03em] text-white sm:text-xl">
                     {value.name}
                   </h4>
 
@@ -194,7 +194,7 @@ export default function About() {
           <div>
             <div className="mb-5 flex items-center gap-3">
               <Gamepad2 size={17} className="text-[#DE8A61]" />
-              <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-sm">
+              <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-sm">
                 What We Create
               </p>
             </div>
@@ -217,7 +217,7 @@ export default function About() {
           <div className="relative py-2 sm:py-4">
             <div className="relative">
               <div className="mb-7 flex items-center justify-between gap-4">
-                <p className="font-mono text-[10px] font-normal uppercase tracking-[0.2em] text-white/45">
+                <p className="font-mono text-[10px] font-normal  tracking-[0.2em] text-white/45">
                   Building blocks of a game
                 </p>
                 <Sparkles size={17} className="text-[#F0CA77]/80" />
@@ -244,7 +244,7 @@ export default function About() {
                           className="h-1.5 w-1.5 rotate-45 border border-[#DE8A61]/70"
                         />
                       </div>
-                      <p className="mt-4 font-ethnocentric text-xs font-normal uppercase tracking-[0.04em] text-white sm:text-sm">
+                      <p className="mt-4 font-ethnocentric text-xs font-normal  tracking-[0.04em] text-white sm:text-sm">
                         {element.title}
                       </p>
                       <p className="mt-1 text-xs text-white/40">
@@ -265,14 +265,14 @@ export default function About() {
               <div className="mb-7 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Sparkles size={17} className="text-[#DE8A61]" />
-                  <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77]">
+                  <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77]">
                     Our Vision
                   </p>
                 </div>
                 <span className="font-mono text-[9px] tracking-[0.2em] text-white/25">01 / 02</span>
               </div>
 
-              <h3 className="mb-5 font-ethnocentric text-2xl font-normal uppercase leading-tight tracking-[-0.04em] text-white sm:text-3xl">
+              <h3 className="mb-5 font-ethnocentric text-2xl font-normal  leading-tight tracking-[-0.04em] text-white sm:text-3xl">
                 Imagination has
                 <br />
                 <span className="gradient-text">no boundaries.</span>
@@ -294,14 +294,14 @@ export default function About() {
               <div className="mb-7 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Gamepad2 size={18} className="text-[#DE8A61]" />
-                  <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77]">
+                  <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77]">
                     Our Journey
                   </p>
                 </div>
                 <span className="font-mono text-[9px] tracking-[0.2em] text-white/25">02 / 02</span>
               </div>
 
-              <h3 className="mb-5 font-ethnocentric text-2xl font-normal uppercase leading-tight tracking-[-0.04em] text-white sm:text-3xl">
+              <h3 className="mb-5 font-ethnocentric text-2xl font-normal  leading-tight tracking-[-0.04em] text-white sm:text-3xl">
                 One game
                 <br />
                 <span className="gradient-text">at a time.</span>
@@ -321,20 +321,20 @@ export default function About() {
           <div className="relative">
             <div className="mb-6 flex items-center gap-3">
               <span className="pixel-dot" />
-              <p className="font-mono text-[10px] font-normal uppercase tracking-[0.25em] text-[#F0CA77]/70 sm:text-xs">
+              <p className="font-mono text-[10px] font-normal  tracking-[0.25em] text-[#F0CA77]/70 sm:text-xs">
                 The reason we create
               </p>
             </div>
 
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-              <h3 className="font-ethnocentric text-[clamp(2rem,7.2vw,6rem)] uppercase leading-[1.08] text-white">
+              <h3 className="font-ethnocentric text-[clamp(2rem,7.2vw,6rem)]  leading-[1.08] text-white">
                 <span className="block">Where ideas</span>
                 <span className="gradient-text block">become games.</span>
               </h3>
 
               <div className="flex items-center gap-4 pb-2 text-[#DE8A61] lg:shrink-0">
                 <Gamepad2 size={34} strokeWidth={1.4} />
-                <span className="font-mono text-[9px] uppercase leading-relaxed tracking-[0.2em] text-white/35 sm:text-[10px]">
+                <span className="font-mono text-[9px]  leading-relaxed tracking-[0.2em] text-white/35 sm:text-[10px]">
                   Akivsoft
                   <br />
                   Game studio

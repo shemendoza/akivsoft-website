@@ -39,7 +39,7 @@ export default function ServiceCard({
         </div>
       </div>
 
-      <h3 className="relative font-ethnocentric text-lg font-normal uppercase leading-snug tracking-[-0.04em] text-white transition-colors duration-300 group-hover:text-[#F0CA77] sm:text-xl lg:text-2xl">
+      <h3 className="relative font-ethnocentric text-lg font-normal  leading-snug tracking-[-0.04em] text-white transition-colors duration-300 group-hover:text-[#F0CA77] sm:text-xl lg:text-2xl">
         {title}
       </h3>
 

@@ -11,7 +11,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type ReactNode,
 } from "react";
 import Image from "next/image";
 
@@ -49,32 +48,32 @@ const portfolioItems: PortfolioItem[] = [
     ],
     features: [
       {
-        icon: "🌌",
+        icon: "\u{1F30C}",
         title: "Endless Space Adventure",
         description: "Fly through an ever-changing cosmic environment.",
       },
       {
-        icon: "☄️",
+        icon: "\u2604\uFE0F",
         title: "Dodge Massive Asteroids",
         description: "Navigate through dangerous asteroid formations.",
       },
       {
-        icon: "💫",
+        icon: "\u{1F4AB}",
         title: "Quick Tap Controls",
         description: "Hold to dive and release to rise.",
       },
       {
-        icon: "❤️",
+        icon: "\u2764\uFE0F",
         title: "Three Lives",
         description: "Make every move count.",
       },
       {
-        icon: "🎮",
+        icon: "\u{1F3AE}",
         title: "Arcade-Style Gameplay",
         description: "Easy to learn, challenging to master.",
       },
       {
-        icon: "🏆",
+        icon: "\u{1F3C6}",
         title: "Survive as Long as You Can",
         description: "Push your limits and beat your best run.",
       },
@@ -117,68 +116,12 @@ const portfolioItems: PortfolioItem[] = [
   },
 ];
 
-function AnimatedInfoBox({
-  code,
-  label,
-  children,
-}: {
-  code: string;
-  label: string;
-  children: ReactNode;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="group overflow-hidden rounded-2xl border border-[#F0CA77]/20 bg-[#15162D]/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-colors duration-300 hover:border-[#F0CA77]/45">
-      <button
-        type="button"
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((open) => !open)}
-        className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F0CA77]/70"
-      >
-        <span className="flex h-7 w-7 items-center justify-center rounded-md border border-[#DE8A61]/35 bg-[#DE8A61]/10 font-[var(--font-rajdhani)] text-[10px] text-[#DE8A61]">
-          {code}
-        </span>
-        <span className="flex-1 font-[var(--font-rajdhani)] text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
-          {label}
-        </span>
-        <span className="font-[var(--font-rajdhani)] text-[9px] uppercase tracking-[0.14em] text-white/35">
-          {isOpen ? "Close" : "Open"}
-        </span>
-        <ChevronDown
-          size={16}
-          aria-hidden="true"
-          className={`text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none ${
-            isOpen ? "rotate-180" : "rotate-0"
-          }`}
-        />
-      </button>
-
-      <div
-        aria-hidden={!isOpen}
-        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
-          isOpen ? "opacity-100" : "opacity-0"
-        }`}
-        style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-      >
-        <div className="overflow-hidden">
-          <div
-            className={`transform border-t border-[#F0CA77]/10 px-4 py-4 transition duration-300 motion-reduce:transition-none ${
-              isOpen ? "translate-y-0" : "-translate-y-2"
-            }`}
-          >
-            {children}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Portfolio() {
   const totalItems = portfolioItems.length;
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [expandedGameIndex, setExpandedGameIndex] =
+    useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [isManuallyPaused, setIsManuallyPaused] =
     useState(false);
@@ -187,6 +130,9 @@ export default function Portfolio() {
 
   const paused =
     isHovered || isManuallyPaused;
+
+  const isGameDetailsOpen =
+    expandedGameIndex === activeIndex;
 
   const portfolioRef =
     useRef<HTMLElement | null>(null);
@@ -328,6 +274,7 @@ export default function Portfolio() {
 
   const selectCard = useCallback(
     (index: number) => {
+      setExpandedGameIndex(null);
       setActiveIndex(index);
       setIsManuallyPaused(true);
 
@@ -341,6 +288,7 @@ export default function Portfolio() {
      ======================================================== */
 
   const advance = useCallback(() => {
+    setExpandedGameIndex(null);
     setActiveIndex(
       (current) =>
         (current + 1) % totalItems,
@@ -348,6 +296,7 @@ export default function Portfolio() {
   }, [totalItems]);
 
   const next = useCallback(() => {
+    setExpandedGameIndex(null);
     setActiveIndex(
       (current) =>
         (current + 1) % totalItems,
@@ -357,6 +306,7 @@ export default function Portfolio() {
   }, [scheduleResume, totalItems]);
 
   const previous = useCallback(() => {
+    setExpandedGameIndex(null);
     setActiveIndex(
       (current) =>
         (current - 1 + totalItems) %
@@ -428,8 +378,7 @@ export default function Portfolio() {
       "
     >
       {/* =====================================================
-          HERO → PORTFOLIO TRANSITION
-
+          HERO TO PORTFOLIO TRANSITION
           The Portfolio starts with the exact same dark
           background as the bottom of Hero.
           ===================================================== */}
@@ -635,7 +584,7 @@ export default function Portfolio() {
             <div className="mb-5 flex items-center gap-3">
               <span className="pixel-dot" />
 
-              <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-sm">
+              <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-sm">
                 Unity games
               </p>
             </div>
@@ -731,7 +680,7 @@ export default function Portfolio() {
                     >
                       <div
                         className={`
-                          ${item.title ? "portfolio-game-opening" : ""}
+                          portfolio-game-opening
                           rounded-[2rem]
                           bg-gradient-to-br
                           ${item.gradient}
@@ -747,19 +696,19 @@ export default function Portfolio() {
                             <div className="relative grid items-center gap-4 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A61]/15 p-5 sm:grid-cols-[1fr_auto] sm:p-7">
                               <div className="relative z-10">
                                 <div className="mb-6 flex flex-wrap items-center gap-3">
-                                  <span className="font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.24em] text-white/55">
+                                  <span className="font-[var(--font-rajdhani)] text-[10px]  tracking-[0.24em] text-white/55">
                                     Game {item.number}
                                   </span>
-                                  <span className="inline-flex items-center gap-2 rounded-full bg-[#F0CA77]/10 px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.16em] text-[#F0CA77]">
+                                  <span className="inline-flex items-center gap-2 rounded-full bg-[#F0CA77]/10 px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px]  tracking-[0.16em] text-[#F0CA77]">
                                     <span className="h-1.5 w-1.5 rounded-full bg-[#F0CA77] shadow-[0_0_10px_#F0CA77]" />
                                     {item.availability}
                                   </span>
                                 </div>
 
-                                <h3 className="font-ethnocentric text-3xl font-normal uppercase leading-tight tracking-[-0.04em] text-white sm:text-4xl md:text-5xl">
+                                <h3 className="font-ethnocentric text-3xl font-normal  leading-tight tracking-[-0.04em] text-white sm:text-4xl md:text-5xl">
                                   {item.title}
                                 </h3>
-                                <p className="mt-3 font-[var(--font-rajdhani)] text-lg font-semibold uppercase tracking-[0.2em] text-[#F0CA77] sm:text-xl">
+                                <p className="mt-3 font-[var(--font-rajdhani)] text-lg font-semibold  tracking-[0.2em] text-[#F0CA77] sm:text-xl">
                                   {item.tagline}
                                 </p>
                               </div>
@@ -778,8 +727,64 @@ export default function Portfolio() {
                               )}
                             </div>
 
-                            <section className="relative mt-7">
-                              <h4 className="mb-3 font-[var(--font-rajdhani)] text-xs font-semibold uppercase tracking-[0.26em] text-[#DE8A61]">
+                            <button
+                              type="button"
+                              aria-expanded={isGameDetailsOpen}
+                              aria-controls="cosmic-dodge-details"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                const shouldOpen = !isGameDetailsOpen;
+                                setExpandedGameIndex(
+                                  shouldOpen ? index : null,
+                                );
+                                setIsManuallyPaused(shouldOpen);
+                                if (resumeTimeoutRef.current !== null) {
+                                  window.clearTimeout(
+                                    resumeTimeoutRef.current,
+                                  );
+                                  resumeTimeoutRef.current = null;
+                                }
+                              }}
+                              className="mt-6 flex min-h-12 w-full items-center justify-between rounded-xl border border-[#F0CA77]/25 bg-[#F0CA77]/[0.045] px-4 text-left transition-colors duration-300 hover:border-[#F0CA77]/55 hover:bg-[#F0CA77]/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CA77]/70"
+                            >
+                              <span className="font-[var(--font-rajdhani)] text-xs font-semibold  tracking-[0.22em] text-[#F0CA77]">
+                                {isGameDetailsOpen ? "Show less" : "Show more"}
+                              </span>
+                              <ChevronDown
+                                size={17}
+                                aria-hidden="true"
+                                className={`text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none ${
+                                  isGameDetailsOpen
+                                    ? "rotate-180"
+                                    : "rotate-0"
+                                }`}
+                              />
+                            </button>
+
+                            <div
+                              id="cosmic-dodge-details"
+                              aria-hidden={!isGameDetailsOpen}
+                              className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out motion-reduce:transition-none ${
+                                isGameDetailsOpen
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                              style={{
+                                gridTemplateRows: isGameDetailsOpen
+                                  ? "1fr"
+                                  : "0fr",
+                              }}
+                            >
+                              <div className="min-h-0 overflow-hidden">
+                                <div
+                                  className={`transform pt-7 transition duration-500 motion-reduce:transition-none ${
+                                    isGameDetailsOpen
+                                      ? "translate-y-0"
+                                      : "-translate-y-2"
+                                  }`}
+                                >
+                            <section className="relative">
+                              <h4 className="mb-3 font-[var(--font-rajdhani)] text-xs font-semibold  tracking-[0.26em] text-[#DE8A61]">
                                 Description
                               </h4>
                               <div className="space-y-4 text-sm leading-relaxed text-[#D8D3E1] sm:text-base">
@@ -792,10 +797,10 @@ export default function Portfolio() {
                             <section className="relative mt-8">
                               <div className="mb-4 flex items-end justify-between gap-4">
                                 <div>
-                                  <p className="font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.28em] text-[#DE8A61]">
+                                  <p className="font-[var(--font-rajdhani)] text-[10px]  tracking-[0.28em] text-[#DE8A61]">
                                     What awaits
                                   </p>
-                                  <h4 className="mt-1 font-ethnocentric text-lg font-normal uppercase tracking-[0.02em] text-white sm:text-xl">
+                                  <h4 className="mt-1 font-ethnocentric text-lg font-normal  tracking-[0.02em] text-white sm:text-xl">
                                     Features
                                   </h4>
                                 </div>
@@ -812,57 +817,104 @@ export default function Portfolio() {
                                       <strong className="font-semibold text-white/90">
                                         {feature.title}
                                       </strong>{" "}
-                                      <span>— {feature.description}</span>
+                                      <span>&mdash; {feature.description}</span>
                                     </p>
                                   </li>
                                 ))}
                               </ul>
                             </section>
 
-                            <div className="relative mt-8 grid gap-3 sm:grid-cols-2">
-                              <AnimatedInfoBox code="01" label="Genre">
-                                <p className="font-ethnocentric text-lg font-normal uppercase text-[#F0CA77]">
-                                  {item.genre}
-                                </p>
-                              </AnimatedInfoBox>
+                           <div className="relative mt-8">
+  <section className="relative overflow-hidden rounded-2xl border border-[#F0CA77]/15 bg-white/[0.025] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] sm:p-5">
+    
+    {/* Genre */}
+    <div className="mb-6">
+      <div className="mb-5 flex items-center gap-3">
+        <span className="flex h-7 w-7 items-center justify-center rounded-md border border-[#DE8A61]/35 bg-[#DE8A61]/10 font-[var(--font-rajdhani)] text-[10px] text-[#DE8A61]">
+          01
+        </span>
 
-                              <AnimatedInfoBox code="02" label="Secondary">
-                                <div className="flex flex-wrap gap-2">
-                                  {item.secondaryGenres.map((genre) => (
-                                    <span
-                                      key={genre}
-                                      className="rounded-full bg-white/[0.07] px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.12em] text-white/75"
-                                    >
-                                      {genre}
-                                    </span>
-                                  ))}
-                                </div>
-                              </AnimatedInfoBox>
-                            </div>
+        <div>
+          <p className="font-[var(--font-rajdhani)] text-[9px] tracking-[0.2em] text-white/35">
+            Game data
+          </p>
 
+          <h4 className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.2em] text-white/80">
+            Genre
+          </h4>
+        </div>
+
+        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#F0CA77] shadow-[0_0_10px_#F0CA77]" />
+      </div>
+
+      <p className="font-ethnocentric text-lg font-normal text-[#F0CA77]">
+        {item.genre}
+      </p>
+    </div>
+
+    {/* Divider */}
+    <div className="mb-6 h-px bg-white/[0.06]" />
+
+    {/* Secondary Genre */}
+    <div>
+      <div className="mb-4 flex items-center gap-3">
+        <span className="flex h-7 w-7 items-center justify-center rounded-md border border-[#3B4895]/50 bg-[#3B4895]/20 font-[var(--font-rajdhani)] text-[10px] text-[#A9B2FF]">
+          02
+        </span>
+
+        <div>
+          <p className="font-[var(--font-rajdhani)] text-[9px] tracking-[0.2em] text-white/35">
+            Gameplay tags
+          </p>
+
+          <h4 className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.2em] text-white/80">
+            Secondary
+          </h4>
+        </div>
+
+        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#3B4895] shadow-[0_0_10px_#3B4895]" />
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {item.secondaryGenres.map((genre) => (
+          <span
+            key={genre}
+            className="rounded-full bg-[#3B4895]/15 px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] tracking-[0.12em] text-white/75"
+          >
+            {genre}
+          </span>
+        ))}
+      </div>
+    </div>
+
+  </section>
+</div>
                             <div className="relative mt-8 space-y-2 text-center">
                               <p className="font-[var(--font-rajdhani)] text-lg font-semibold text-[#F0CA77] sm:text-xl">
                                 How long can you survive the cosmic chaos?
                               </p>
-                              <p className="font-[var(--font-rajdhani)] text-sm uppercase tracking-[0.12em] text-white/60 sm:text-base">
+                              <p className="font-[var(--font-rajdhani)] text-sm  tracking-[0.12em] text-white/60 sm:text-base">
                                 Enter the void. Take flight. Dodge everything.
                               </p>
-                              <p className="pt-3 font-ethnocentric text-xs font-normal uppercase tracking-[0.18em] text-white/75 sm:text-sm">
+                              <p className="pt-3 font-ethnocentric text-xs font-normal  tracking-[0.18em] text-white/75 sm:text-sm">
                                 Cosmic Dodge
                               </p>
-                              <p className="font-[var(--font-rajdhani)] text-sm font-semibold uppercase tracking-[0.18em] text-[#DE8A61]">
+                              <p className="font-[var(--font-rajdhani)] text-sm font-semibold  tracking-[0.18em] text-[#DE8A61]">
                                 How long can you stay alive?
                               </p>
                             </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         ) : (
-                          <div className="relative flex min-h-[340px] flex-col items-center justify-center overflow-hidden rounded-[2rem] bg-[#111225] p-8 text-center sm:min-h-[400px]">
+                          <div className="portfolio-game-content-reveal relative flex min-h-[340px] flex-col items-center justify-center overflow-hidden rounded-[2rem] bg-[#111225] p-8 text-center sm:min-h-[400px]">
                             <div className="pointer-events-none absolute h-64 w-64 rounded-full border border-[#F0CA77]/10" />
                             <div className="pointer-events-none absolute h-48 w-48 rounded-full border border-[#DE8A61]/15" />
                             <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3B4895] to-[#DE8A61] shadow-[0_0_50px_rgba(59,72,149,0.3)]">
                               <item.icon size={28} className="text-[#15162D]" aria-hidden="true" />
                             </div>
-                            <p className="relative mt-3 font-ethnocentric text-xl font-normal uppercase tracking-[0.04em] text-[#F0CA77] sm:text-2xl">
+                            <p className="relative mt-3 font-ethnocentric text-xl font-normal  tracking-[0.04em] text-[#F0CA77] sm:text-2xl">
                               {item.availability}
                             </p>
                           </div>
@@ -1001,7 +1053,7 @@ export default function Portfolio() {
                                   font-ethnocentric
                                   text-2xl
                                   font-normal
-                                  uppercase
+
                                   tracking-[-0.04em]
                                   text-white/90
                                 "
@@ -1010,7 +1062,7 @@ export default function Portfolio() {
                               </h3>
                             )}
 
-                            <p className="mt-5 font-[var(--font-rajdhani)] text-[10px] uppercase tracking-[0.2em] text-[#F0CA77]/70">
+                            <p className="mt-5 font-[var(--font-rajdhani)] text-[10px]  tracking-[0.2em] text-[#F0CA77]/70">
                               {item.availability}
                             </p>
 
@@ -1023,7 +1075,7 @@ export default function Portfolio() {
                                 font-[var(--font-rajdhani)]
                                 text-[10px]
                                 font-normal
-                                uppercase
+
                                 tracking-[0.2em]
                                 text-white/30
                                 transition-colors
@@ -1154,7 +1206,7 @@ export default function Portfolio() {
               font-[var(--font-rajdhani)]
               text-[10px]
               font-normal
-              uppercase
+
               tracking-[0.25em]
               text-white/25
             "

@@ -49,12 +49,12 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
         <div className="mb-5 flex items-center gap-3">
           <span className="pixel-dot" />
 
-          <p className="text-[10px] font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-xs">
+          <p className="text-[10px] font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-xs">
             Akivsoft
           </p>
         </div>
 
-        <h2 className="max-w-4xl text-[15vw] font-normal uppercase leading-[0.78] tracking-[-0.07em] text-white sm:text-7xl lg:text-8xl xl:text-9xl">
+        <h2 className="max-w-4xl text-[15vw] font-normal  leading-[0.78] tracking-[-0.07em] text-white sm:text-7xl lg:text-8xl xl:text-9xl">
           Make
           <br />
           worlds
@@ -69,7 +69,7 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
         <div className="mt-8 flex w-fit items-center gap-3 rounded-full bg-white/[0.04] px-4 py-2.5 backdrop-blur-md">
           <span className="h-2 w-2 rounded-full bg-[#DE8A61] shadow-[0_0_14px_rgba(222,138,97,0.8)]" />
 
-          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/40">
+          <span className="font-mono text-[9px]  tracking-[0.18em] text-white/40">
             Build mode: active
           </span>
 
@@ -79,7 +79,7 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
 
       {/* Navigation */}
       <div>
-        <h3 className="mb-6 text-[10px] font-normal uppercase tracking-[0.25em] text-[#F0CA77]/40 sm:text-xs">
+        <h3 className="mb-6 text-[10px] font-normal  tracking-[0.25em] text-[#F0CA77]/40 sm:text-xs">
           Navigation
         </h3>
 
@@ -103,7 +103,7 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
 
       {/* Services */}
       <div>
-        <h3 className="mb-6 text-[10px] font-normal uppercase tracking-[0.25em] text-[#F0CA77]/40 sm:text-xs">
+        <h3 className="mb-6 text-[10px] font-normal  tracking-[0.25em] text-[#F0CA77]/40 sm:text-xs">
           Services
         </h3>
 
@@ -121,7 +121,7 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
 
       {/* Social */}
       <div>
-        <h3 className="mb-6 text-[10px] font-normal uppercase tracking-[0.25em] text-[#F0CA77]/40 sm:text-xs">
+        <h3 className="mb-6 text-[10px] font-normal  tracking-[0.25em] text-[#F0CA77]/40 sm:text-xs">
           Connect
         </h3>
 
@@ -148,7 +148,7 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
 
     <div className="mt-16 pt-6 sm:mt-20">
       <div className="flex flex-col gap-4 text-xs text-white/30 sm:flex-row sm:items-center sm:justify-between">
-        <p>© {new Date().getFullYear()} Akivsoft.</p>
+        <p>&copy; {new Date().getFullYear()} Akivsoft.</p>
 
         <div className="flex flex-wrap items-center gap-2">
           <span>Built with</span>

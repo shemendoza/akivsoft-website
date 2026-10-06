@@ -86,7 +86,7 @@ export default function Contact() {
           <div>
             <div className="mb-5 flex items-center gap-3">
               <span className="pixel-dot" />
-              <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-sm">
+              <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-sm">
                 Start a project
               </p>
             </div>
@@ -106,7 +106,7 @@ export default function Contact() {
               {["Concepts", "Prototypes", "Full game development"].map((item) => (
                 <span
                   key={item}
-                  className="rounded-full bg-[#F0CA77]/10 px-3.5 py-2 font-[var(--font-rajdhani)] text-xs font-normal uppercase tracking-[0.12em] text-[#F0CA77] sm:text-sm"
+                  className="rounded-full bg-[#F0CA77]/10 px-3.5 py-2 font-[var(--font-rajdhani)] text-xs font-normal  tracking-[0.12em] text-[#F0CA77] sm:text-sm"
                 >
                   {item}
                 </span>
@@ -122,7 +122,7 @@ export default function Contact() {
                   <Mail size={20} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/30">
+                  <p className="text-[9px]  tracking-[0.2em] text-white/30">
                     Email
                   </p>
                   <p className="mt-1 truncate text-sm text-white/70">
@@ -136,7 +136,7 @@ export default function Contact() {
                   <MessageCircle size={20} />
                 </div>
                 <div>
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/30">
+                  <p className="text-[9px]  tracking-[0.2em] text-white/30">
                     Availability
                   </p>
                   <p className="mt-1 text-sm text-white/70">
@@ -146,10 +146,10 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="mt-10 hidden items-center gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-white/25 lg:flex">
+            <div className="mt-10 hidden items-center gap-3 font-mono text-[9px]  tracking-[0.2em] text-white/25 lg:flex">
               <span className="text-[#DE8A61]">&gt;</span>
               <span>project.inquiry</span>
-              <span className="text-[#F0CA77]">READY</span>
+              <span className="text-[#F0CA77]">Ready</span>
             </div>
           </div>
 
@@ -162,7 +162,7 @@ export default function Contact() {
                   <div>
                     <div className="mb-2 flex items-center gap-2">
                       <Sparkles size={15} className="text-[#F0CA77]" />
-                      <span className="text-[10px] uppercase tracking-[0.25em] text-white/40">
+                      <span className="text-[10px]  tracking-[0.25em] text-white/40">
                         Project inquiry
                       </span>
                     </div>
@@ -215,7 +215,7 @@ export default function Contact() {
 
                     <div className="grid gap-5 sm:grid-cols-2">
                       <label className="block">
-                        <span className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/40">
+                        <span className="mb-2 block text-[10px]  tracking-[0.2em] text-white/40">
                           Name
                         </span>
                         <input
@@ -229,7 +229,7 @@ export default function Contact() {
                       </label>
 
                       <label className="block">
-                        <span className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/40">
+                        <span className="mb-2 block text-[10px]  tracking-[0.2em] text-white/40">
                           Email
                         </span>
                         <input
@@ -244,7 +244,7 @@ export default function Contact() {
                     </div>
 
                     <label className="block">
-                      <span className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/40">
+                      <span className="mb-2 block text-[10px]  tracking-[0.2em] text-white/40">
                         Service
                       </span>
                       <select
@@ -269,7 +269,7 @@ export default function Contact() {
                     </label>
 
                     <label className="block">
-                      <span className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/40">
+                      <span className="mb-2 block text-[10px]  tracking-[0.2em] text-white/40">
                         Message
                       </span>
                       <textarea

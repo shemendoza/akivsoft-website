@@ -170,7 +170,7 @@ export default function Services() {
           <div>
             <div className="mb-5 flex items-center gap-3">
               <Gamepad2 size={17} className="text-[#DE8A61]" />
-              <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-sm">
+              <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-sm">
                 Our Services
               </p>
             </div>
@@ -190,7 +190,7 @@ export default function Services() {
               genre and platform.
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3 font-mono text-[9px] font-normal uppercase tracking-[0.18em] text-white/35 sm:text-[10px]">
+            <div className="mt-6 flex flex-wrap items-center gap-3 font-mono text-[9px] font-normal  tracking-[0.18em] text-white/35 sm:text-[10px]">
               <span>Concept</span>
               <span className="pixel-dot" />
               <span>Build</span>
@@ -203,10 +203,10 @@ export default function Services() {
 
         <div className="relative">
           <div className="flex items-center justify-between gap-4 py-4">
-            <p className="font-[var(--font-rajdhani)] text-xs font-normal uppercase tracking-[0.25em] text-white/55 sm:text-sm">
+            <p className="font-[var(--font-rajdhani)] text-xs font-normal  tracking-[0.25em] text-white/55 sm:text-sm">
               Game development services
             </p>
-            <span className="whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.16em] text-[#F0CA77]/45 sm:text-[10px]">
+            <span className="whitespace-nowrap font-mono text-[9px]  tracking-[0.16em] text-[#F0CA77]/45 sm:text-[10px]">
               10 ways to play
             </span>
           </div>
@@ -220,7 +220,7 @@ export default function Services() {
           <div>
             <div className="mb-5 flex items-center gap-3">
               <span className="pixel-dot" />
-              <p className="text-xs font-normal uppercase tracking-[0.3em] text-[#F0CA77] sm:text-sm">
+              <p className="text-xs font-normal  tracking-[0.3em] text-[#F0CA77] sm:text-sm">
                 Find your next favorite
               </p>
             </div>
@@ -243,7 +243,7 @@ export default function Services() {
             <div className="art-grid pointer-events-none absolute inset-0 opacity-20" />
             <div className="relative">
               <div className="mb-7 flex items-center justify-between gap-4">
-                <p className="font-mono text-[10px] font-normal uppercase tracking-[0.2em] text-white/45">
+                <p className="font-mono text-[10px] font-normal  tracking-[0.2em] text-white/45">
                   Choose your adventure
                 </p>
                 <Gamepad2 size={19} className="text-[#DE8A61]/80" />
@@ -253,7 +253,7 @@ export default function Services() {
                 {genres.map((genre, index) => (
                   <span
                     key={genre}
-                    className={`rounded-full px-4 py-2 font-[var(--font-rajdhani)] text-xs font-normal uppercase tracking-[0.14em] sm:text-sm ${genreAccents[index % genreAccents.length]}`}
+                    className={`rounded-full px-4 py-2 font-[var(--font-rajdhani)] text-xs font-normal  tracking-[0.14em] sm:text-sm ${genreAccents[index % genreAccents.length]}`}
                   >
                     {genre}
                   </span>
@@ -274,7 +274,7 @@ export default function Services() {
 
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <div className="mb-5 flex items-center gap-2 font-mono text-[10px] font-normal uppercase tracking-[0.2em] text-[#F0CA77]">
+              <div className="mb-5 flex items-center gap-2 font-mono text-[10px] font-normal  tracking-[0.2em] text-[#F0CA77]">
                 <Sparkles size={14} />
                 Planning the next build
               </div>

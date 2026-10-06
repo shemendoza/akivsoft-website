@@ -471,7 +471,7 @@ export default function Hero() {
                     font-rajdhani
                     text-xs
                     font-normal
-                    uppercase
+
                     tracking-[0.35em]
                     text-[#F0CA77]
                   "
@@ -486,12 +486,12 @@ export default function Hero() {
               </div>
 
               <h1 className="m-0 max-w-[760px] font-ethnocentric text-[clamp(3rem,7vw,6rem)] font-normal leading-[0.98] tracking-[-0.025em]">
-                <span className="block text-white">IDEAS MADE</span>
+                <span className="block text-white">Ideas made</span>
                 <span
                   className="gradient-text block w-fit pr-[0.12em]"
                   style={{ animation: "none" }}
                 >
-                  PLAYABLE
+                  Playable
                 </span>
               </h1>
 
@@ -630,18 +630,18 @@ export default function Hero() {
                         mt-5
                         font-rajdhani
                         text-sm
-                        uppercase
+
                         tracking-[0.35em]
                         text-white/50
                       "
                     >
                       Create
                       <span className="mx-2 text-[#F0CA77]">
-                        ×
+                        .
                       </span>
                       Build
                       <span className="mx-2 text-[#DE8A61]">
-                        ×
+                          .
                       </span>
                       Imagine
                     </p>
@@ -652,7 +652,7 @@ export default function Hero() {
                   <div className="hero-orbit-planet">
                     <span className="hero-orbit-badge inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#15162D]/60 backdrop-blur-md">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#5362B7] shadow-[0_0_12px_2px_rgba(83,98,183,0.75)]" />
-                      <span className="font-rajdhani text-xs uppercase tracking-[0.2em] text-white/70">
+                      <span className="font-rajdhani text-xs  tracking-[0.2em] text-white/70">
                         Code
                       </span>
                     </span>
@@ -663,7 +663,7 @@ export default function Hero() {
                   <div className="hero-orbit-planet">
                     <span className="hero-orbit-badge inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#15162D]/60 backdrop-blur-md">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#DE8A61] shadow-[0_0_12px_2px_rgba(222,138,97,0.75)]" />
-                      <span className="font-rajdhani text-xs uppercase tracking-[0.2em] text-white/70">
+                      <span className="font-rajdhani text-xs  tracking-[0.2em] text-white/70">
                         Art
                       </span>
                     </span>
@@ -697,7 +697,7 @@ export default function Hero() {
             className="
               font-rajdhani
               text-[10px]
-              uppercase
+
               tracking-[0.35em]
               text-white/40
               transition-colors
@@ -742,8 +742,7 @@ export default function Hero() {
       </div>
 
       {/* =====================================================
-          HERO → PORTFOLIO TRANSITION
-
+          HERO TO PORTFOLIO TRANSITION
           IMPORTANT:
           This remains inside Hero, but the Hero itself
           does NOT fade away.
