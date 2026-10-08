@@ -5,15 +5,8 @@ import { FormEvent, useState } from "react";
 
 const services = [
   "Game Development",
-  "Game Concept & Design",
-  "2D & 3D Game Development",
-  "Multiplayer & Online Games",
-  "Mobile Game Development",
-  "PC & Console Game Development",
-  "Game Art & Animation",
-  "Sound & Game Audio",
-  "Optimization & Testing",
-  "Launch & Support",
+  "Web Development",
+  "Application Development",
   "Other",
 ];
 

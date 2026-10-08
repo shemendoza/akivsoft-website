@@ -21,93 +21,39 @@ type ServiceAccent = "blue" | "purple" | "cyan" | "pink";
 const services = [
   {
     number: "01",
-    title: "Game Development",
+    title: "2D & 3D Game Development",
     description:
-      "We build core gameplay systems, responsive controls, interfaces, and content around the needs of your project.",
-    tags: ["Gameplay", "Unity", "C#"],
+      "We create engaging 2D and 3D games for mobile and PC, with responsive controls, polished gameplay, and immersive experiences.",
+    tags: ["2D", "3D", "Mobile", "PC"],
     icon: Gamepad2,
     accent: "blue",
   },
   {
     number: "02",
-    title: "Game Concept & Design",
+    title: "Game Concept, Art & Design",
     description:
-      "Every great game starts with a great idea. We help transform concepts into compelling game experiences through gameplay mechanics, game systems, level design, progression, and player experiences.",
-    tags: ["Mechanics", "Systems", "Level Design"],
+      "From the initial idea to the final visual experience, we develop game concepts, mechanics, visuals, interfaces, and creative direction.",
+    tags: ["Concept", "Art", "Game Design"],
     icon: Lightbulb,
     accent: "purple",
   },
   {
     number: "03",
-    title: "2D & 3D Game Development",
+    title: "Game Optimization & Testing",
     description:
-      "Whether you're looking for a stylized 2D experience or an immersive 3D world, we create games with engaging visuals, responsive controls, and polished gameplay.",
-    tags: ["2D", "3D", "Unity"],
-    icon: Box,
+      "We test and optimize games to improve performance, identify bugs, refine gameplay, and deliver a smoother player experience.",
+    tags: ["QA", "Testing", "Optimization"],
+    icon: Gauge,
     accent: "pink",
   },
   {
     number: "04",
-    title: "Multiplayer & Online Games",
-    description:
-      "We develop multiplayer experiences designed for engaging player interactions, including competitive and cooperative gameplay, online systems, matchmaking, and player progression.",
-    tags: ["Online", "Co-op", "Competitive"],
-    icon: Users,
-    accent: "cyan",
-  },
-  {
-    number: "05",
-    title: "Mobile Game Development",
-    description:
-      "We create engaging mobile games optimized for smooth performance and intuitive controls across modern mobile devices.",
-    tags: ["iOS", "Android", "Mobile UX"],
-    icon: Smartphone,
-    accent: "purple",
-  },
-  {
-    number: "06",
-    title: "PC & Console Game Development",
-    description:
-      "Our development services extend to PC and console experiences, with a focus on responsive gameplay, performance optimization, and platform-specific requirements.",
-    tags: ["PC", "Console", "Optimization"],
-    icon: Monitor,
-    accent: "blue",
-  },
-  {
-    number: "07",
-    title: "Game Art & Animation",
-    description:
-      "Bring your game world to life with distinctive characters, environments, animations, interfaces, and visual effects that complement the gameplay and create a memorable experience.",
-    tags: ["Characters", "Animation", "VFX"],
-    icon: Palette,
-    accent: "pink",
-  },
-  {
-    number: "08",
-    title: "Sound & Game Audio",
-    description:
-      "Sound plays an important role in immersion. We integrate music, sound effects, environmental audio, and interactive audio elements to enhance the overall player experience.",
-    tags: ["Music", "SFX", "Interactive Audio"],
-    icon: AudioLines,
-    accent: "cyan",
-  },
-  {
-    number: "09",
-    title: "Game Optimization & Testing",
-    description:
-      "We test and optimize games to identify bugs, improve performance, refine gameplay, and provide a smoother experience across supported platforms and devices.",
-    tags: ["QA", "Profiling", "Performance"],
-    icon: Gauge,
-    accent: "purple",
-  },
-  {
-    number: "10",
     title: "Game Launch & Support",
     description:
-      "Our work doesn't stop when development is complete. We can support the launch process, updates, improvements, technical maintenance, and ongoing development of your game.",
+      "We help prepare games for release and provide ongoing support through updates, improvements, maintenance, and technical assistance.",
     tags: ["Launch", "Updates", "Support"],
     icon: Rocket,
-    accent: "blue",
+    accent: "cyan",
   },
 ] satisfies {
   number: string;
@@ -203,12 +149,12 @@ export default function Services() {
 
         <div className="relative">
           <div className="flex items-center justify-between gap-4 py-4">
-            <p className="font-[var(--font-rajdhani)] text-xs font-normal  tracking-[0.25em] text-white/55 sm:text-sm">
-              Game development services
-            </p>
-            <span className="whitespace-nowrap font-mono text-[9px]  tracking-[0.16em] text-[#F0CA77]/45 sm:text-[10px]">
-              10 ways to play
-            </span>
+            <p className="font-[var(--font-rajdhani)] text-xs font-normal tracking-[0.25em] text-white/55 sm:text-sm">
+  Game development services
+</p>
+            <span className="whitespace-nowrap font-mono text-[9px] tracking-[0.16em] text-[#F0CA77]/45 sm:text-[10px]">
+  4 ways to build
+</span>
           </div>
 
           {services.map((service) => (
