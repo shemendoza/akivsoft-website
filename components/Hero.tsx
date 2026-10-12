@@ -4,7 +4,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { CSSProperties } from "react";
-
+import Image from "next/image";
 type LeafShape = "maple" | "oak" | "ginkgo" | "serrated";
 
 type AutumnLeaf = {
@@ -613,17 +613,14 @@ export default function Hero() {
                       text-center
                     "
                   >
-                    <span
-                      className="
-                        font-ethnocentric
-                        text-[clamp(4rem,9vw,8rem)]
-                        font-normal
-                        leading-none
-                        text-white/90
-                      "
-                    >
-                      A
-                    </span>
+                    <Image
+    src="/images/a-logo.png"
+    alt="AKIVSOFT logo"
+    width={160}
+    height={160}
+    priority
+    className="h-[clamp(4rem,9vw,8rem)] w-auto object-contain"
+  />
 
                     <p
                       className="

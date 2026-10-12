@@ -153,57 +153,60 @@ export default function Navbar() {
           >
             {/* A LOGO */}
 
-            <div
-              className="
-                relative
-                h-11
-                w-11
-                sm:h-12
-                sm:w-12
-                lg:h-14
-                lg:w-14
-                xl:h-16
-                xl:w-16
-                2xl:h-[4.25rem]
-                2xl:w-[4.25rem]
-              "
-            >
-              <Image
-                src="/images/a-logo.png"
-                alt="AKIVSOFT"
-                fill
-                priority
-                sizes="68px"
-                className="object-contain"
-              />
-            </div>
+<div
+  className="
+    relative
+    h-16
+    w-16
+    sm:h-20
+    sm:w-20
+    md:h-22
+    md:w-22
+    lg:h-24
+    lg:w-24
+    xl:h-[100px]
+    xl:w-[100px]
+    2xl:h-[100px]
+    2xl:w-[100px]
+    shrink-0
+  "
+>
+  <Image
+    src="/images/a-logo.png"
+    alt="AKIVSOFT"
+    fill
+    priority
+    sizes="(max-width: 639px) 64px, (max-width: 767px) 80px, (max-width: 1023px) 88px, (max-width: 1279px) 96px, 100px"
+    className="object-contain"
+  />
+</div>
 
-            {/* AKIVSOFT TEXT */}
+{/* AKIVSOFT TEXT */}
 
-            <div
-              className="
-                relative
-                h-8
-                w-[135px]
-                sm:h-9
-                sm:w-[150px]
-                lg:h-10
-                lg:w-[165px]
-                xl:h-11
-                xl:w-[180px]
-                2xl:h-12
-                2xl:w-[195px]
-              "
-            >
-              <Image
-                src="/images/akivsoft-text-img.png"
-                alt="AKIVSOFT"
-                fill
-                priority
-                sizes="195px"
-                className="object-contain object-left"
-              />
-            </div>
+<div
+  className="
+    relative
+    h-8
+    w-[135px]
+    sm:h-9
+    sm:w-[150px]
+    lg:h-10
+    lg:w-[165px]
+    xl:h-11
+    xl:w-[180px]
+    2xl:h-12
+    2xl:w-[195px]
+  "
+>
+  <Image
+    src="/images/akivsoft-text-img.png"
+    alt="AKIVSOFT"
+    fill
+    priority
+    sizes="195px"
+    className="object-contain object-left"
+  />
+</div>
           </a>
 
           {/* =================================================
