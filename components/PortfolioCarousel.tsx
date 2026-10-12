@@ -36,12 +36,19 @@ export default function PortfolioCarousel({
   const [isHovered, setIsHovered] = useState(false);
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [isPageScrolling, setIsPageScrolling] = useState(false);
 
-  const paused = isHovered || isManuallyPaused || isClosing;
+  const paused =
+    isHovered ||
+    isManuallyPaused ||
+    isClosing ||
+    isPageScrolling;
+
   const isDetailsOpen = expandedIndex === activeIndex;
 
   const resumeTimeoutRef = useRef<number | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
+  const pageScrollTimeoutRef = useRef<number | null>(null);
   const activeCardRef = useRef<HTMLDivElement | null>(null);
   const transitionIdRef = useRef(0);
 
@@ -73,9 +80,54 @@ export default function PortfolioCarousel({
     }, 5000);
   }, []);
 
+  /*
+   * Pause autoplay while the user scrolls the page.
+   * This prevents card transitions from interfering with
+   * smooth scrolling and other vertically animated sections.
+   */
+  useEffect(() => {
+    let mounted = true;
+
+    const handlePageScroll = () => {
+      if (!mounted) return;
+
+      setIsPageScrolling(true);
+
+      if (pageScrollTimeoutRef.current !== null) {
+        window.clearTimeout(pageScrollTimeoutRef.current);
+      }
+
+      pageScrollTimeoutRef.current = window.setTimeout(() => {
+        pageScrollTimeoutRef.current = null;
+
+        if (mounted) {
+          setIsPageScrolling(false);
+        }
+      }, 1200);
+    };
+
+    window.addEventListener("scroll", handlePageScroll, {
+      passive: true,
+    });
+
+    return () => {
+      mounted = false;
+
+      window.removeEventListener("scroll", handlePageScroll);
+
+      if (pageScrollTimeoutRef.current !== null) {
+        window.clearTimeout(pageScrollTimeoutRef.current);
+        pageScrollTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
   /**
-   * Collapse the details first, then reverse the existing card
-   * opening animation before activating the requested card.
+   * Collapse the expanded details before reversing the card's
+   * existing opening animation and activating the next card.
+   *
+   * Important: this function never changes the window scroll
+   * position. Page scrolling remains under the user's control.
    */
   const transitionTo = useCallback(
     (index: number, manual = false) => {
@@ -106,24 +158,7 @@ export default function PortfolioCarousel({
       }
 
       /*
-       * Preserve the current document scroll position so changes
-       * to the expanded content do not move the page unexpectedly.
-       */
-      const originalScrollY = window.scrollY;
-
-      const restoreScrollPosition = () => {
-        if (Math.abs(window.scrollY - originalScrollY) > 1) {
-          window.scrollTo({
-            top: originalScrollY,
-            left: window.scrollX,
-            behavior: "auto",
-          });
-        }
-      };
-
-      /*
-       * Capture the original opening animations before changing
-       * the expanded state. These will be reversed later.
+       * Capture animations before the expanded state changes.
        */
       const openingAnimations = card
         .getAnimations({ subtree: true })
@@ -164,17 +199,6 @@ export default function PortfolioCarousel({
 
         setActiveIndex(index);
         setIsClosing(false);
-
-        /*
-         * Restore after React has committed the new active card.
-         */
-        window.requestAnimationFrame(() => {
-          restoreScrollPosition();
-
-          window.requestAnimationFrame(() => {
-            restoreScrollPosition();
-          });
-        });
       };
 
       const reverseOpeningAnimations = () => {
@@ -185,10 +209,6 @@ export default function PortfolioCarousel({
           return;
         }
 
-        /*
-         * Reverse only the captured animations. Do not invent a
-         * different clip-path animation for the closing effect.
-         */
         const reversibleAnimations = openingAnimations.filter(
           (animation) => {
             try {
@@ -214,7 +234,7 @@ export default function PortfolioCarousel({
               animation.finished.catch(() => undefined),
             );
           } catch {
-            // Continue if one animation cannot be reversed.
+            // Continue if an individual animation cannot be reversed.
           }
         });
 
@@ -227,16 +247,15 @@ export default function PortfolioCarousel({
       };
 
       /*
-       * Wait for React to apply the collapsed layout before
-       * checking the details' closing transitions.
+       * Allow React to apply the collapsed layout first.
+       * Then wait for the details transition before reversing
+       * the original card animation.
        */
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
           if (transitionId !== transitionIdRef.current) {
             return;
           }
-
-          restoreScrollPosition();
 
           const detailsElement =
             card.querySelector<HTMLElement>('[id$="-details"]');
@@ -323,7 +342,10 @@ export default function PortfolioCarousel({
     );
   }, [activeIndex, totalItems, transitionTo]);
 
-  // Autoplay uses the same collapse and closing sequence.
+  /*
+   * Autoplay is disabled during page scrolling, hover,
+   * manual pause, and card closing.
+   */
   useEffect(() => {
     if (paused || totalItems <= 1) return;
 
@@ -334,17 +356,18 @@ export default function PortfolioCarousel({
     return () => window.clearInterval(interval);
   }, [advance, paused, totalItems]);
 
-  // Clear pending timers when the component unmounts.
   useEffect(() => {
     return () => {
       if (resumeTimeoutRef.current !== null) {
         window.clearTimeout(resumeTimeoutRef.current);
-        resumeTimeoutRef.current = null;
       }
 
       if (transitionTimeoutRef.current !== null) {
         window.clearTimeout(transitionTimeoutRef.current);
-        transitionTimeoutRef.current = null;
+      }
+
+      if (pageScrollTimeoutRef.current !== null) {
+        window.clearTimeout(pageScrollTimeoutRef.current);
       }
 
       transitionIdRef.current++;
@@ -474,7 +497,7 @@ export default function PortfolioCarousel({
                             <div className="relative mx-auto h-44 w-44 sm:h-56 sm:w-56">
                               <Image
                                 src={item.image}
-                                alt="Cosmic Dodge character artwork"
+                                alt={`${item.title} artwork`}
                                 width={300}
                                 height={300}
                                 sizes="(min-width: 768px) 224px, 176px"
