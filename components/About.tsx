@@ -114,7 +114,7 @@ export default function About() {
   where
   <span className="gradient-text"> art, code,</span>
   <br />
-  and ideas collide.
+  and <span className="gradient-text">ideas </span>collide.
 </h3>
           </div>
 
@@ -325,7 +325,7 @@ export default function About() {
       <div className="space-y-4 text-sm leading-relaxed text-[#C5BFD0] sm:text-base">
         <p>
           We envision a studio where art, code, and ideas come together to
-          create meaningful digital experiences—from games that bring people
+          create meaningful digital experiences — from games that bring people
           together to applications and websites that make ideas a reality.
         </p>
 

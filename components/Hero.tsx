@@ -635,15 +635,11 @@ export default function Hero() {
                         text-white/50
                       "
                     >
-                      Create
-                      <span className="mx-2 text-[#F0CA77]">
-                        .
-                      </span>
-                      Build
-                      <span className="mx-2 text-[#DE8A61]">
-                          .
-                      </span>
-                      Imagine
+                      Dream
+<span className="mx-2 text-[#F0CA77]">.</span>
+Design
+<span className="mx-2 text-[#DE8A61]">.</span>
+Develop
                     </p>
                   </div>
                 </div>
