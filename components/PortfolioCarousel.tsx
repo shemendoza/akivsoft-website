@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -73,11 +74,8 @@ export default function PortfolioCarousel({
   }, []);
 
   /**
-   * Reverse the animations already used by the opening card.
-   *
-   * This allows the purple reveal, content reveal, and animated
-   * line/pseudo-elements to play backward rather than introducing
-   * a separate opening effect or replacing the existing design.
+   * Collapse the details first, then reverse the existing card
+   * opening animation before activating the requested card.
    */
   const transitionTo = useCallback(
     (index: number, manual = false) => {
@@ -90,19 +88,62 @@ export default function PortfolioCarousel({
       }
 
       const transitionId = ++transitionIdRef.current;
+      const card = activeCardRef.current;
 
-      setIsClosing(true);
-      setExpandedIndex(null);
+      if (transitionTimeoutRef.current !== null) {
+        window.clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = null;
+      }
 
       if (manual) {
         setIsManuallyPaused(true);
         scheduleResume();
       }
 
-      if (transitionTimeoutRef.current !== null) {
-        window.clearTimeout(transitionTimeoutRef.current);
-        transitionTimeoutRef.current = null;
+      if (!card) {
+        setActiveIndex(index);
+        return;
       }
+
+      /*
+       * Preserve the current document scroll position so changes
+       * to the expanded content do not move the page unexpectedly.
+       */
+      const originalScrollY = window.scrollY;
+
+      const restoreScrollPosition = () => {
+        if (Math.abs(window.scrollY - originalScrollY) > 1) {
+          window.scrollTo({
+            top: originalScrollY,
+            left: window.scrollX,
+            behavior: "auto",
+          });
+        }
+      };
+
+      /*
+       * Capture the original opening animations before changing
+       * the expanded state. These will be reversed later.
+       */
+      const openingAnimations = card
+        .getAnimations({ subtree: true })
+        .filter((animation) => {
+          const effect = animation.effect;
+
+          if (!(effect instanceof KeyframeEffect)) {
+            return false;
+          }
+
+          const target = effect.target;
+
+          return (
+            target === card ||
+            (target instanceof Element && card.contains(target))
+          );
+        });
+
+      setIsClosing(true);
+      setExpandedIndex(null);
 
       let completed = false;
 
@@ -123,88 +164,128 @@ export default function PortfolioCarousel({
 
         setActiveIndex(index);
         setIsClosing(false);
+
+        /*
+         * Restore after React has committed the new active card.
+         */
+        window.requestAnimationFrame(() => {
+          restoreScrollPosition();
+
+          window.requestAnimationFrame(() => {
+            restoreScrollPosition();
+          });
+        });
       };
 
-      const card = activeCardRef.current;
+      const reverseOpeningAnimations = () => {
+        if (
+          completed ||
+          transitionId !== transitionIdRef.current
+        ) {
+          return;
+        }
 
-      if (!card) {
-        finishTransition();
-        return;
-      }
+        /*
+         * Reverse only the captured animations. Do not invent a
+         * different clip-path animation for the closing effect.
+         */
+        const reversibleAnimations = openingAnimations.filter(
+          (animation) => {
+            try {
+              return animation.playState !== "idle";
+            } catch {
+              return false;
+            }
+          },
+        );
 
-      /*
-       * Include animations on the card, its children, and its
-       * pseudo-elements. This is important for reversing the
-       * existing purple reveal and middle-line animation.
-       */
-      const animations = card.getAnimations({
-        subtree: true,
-      });
+        if (reversibleAnimations.length === 0) {
+          finishTransition();
+          return;
+        }
 
-      if (animations.length > 0) {
-        const animationPromises: Promise<unknown>[] = [];
+        const finishedPromises: Promise<unknown>[] = [];
 
-        animations.forEach((animation) => {
+        reversibleAnimations.forEach((animation) => {
           try {
             animation.reverse();
 
-            animationPromises.push(
+            finishedPromises.push(
               animation.finished.catch(() => undefined),
             );
           } catch {
-            // Continue reversing the remaining animations.
+            // Continue if one animation cannot be reversed.
           }
         });
 
-        /*
-         * The normal path waits for the reversed animations to
-         * finish. The timeout is a safety fallback in case a CSS
-         * animation has an infinite duration or cannot finish.
-         */
         transitionTimeoutRef.current = window.setTimeout(
           finishTransition,
           1500,
         );
 
-        Promise.all(animationPromises).then(() => {
-          finishTransition();
-        });
-
-        return;
-      }
+        Promise.all(finishedPromises).then(finishTransition);
+      };
 
       /*
-       * Fallback for cards that have no Web Animations API entries.
-       * This does not change the existing opening animation.
+       * Wait for React to apply the collapsed layout before
+       * checking the details' closing transitions.
        */
-      const fallbackAnimation = card.animate(
-        [
-          {
-            clipPath: "inset(0% 0% 0% 0% round 2rem)",
-          },
-          {
-            clipPath: "inset(49.7% 0% 49.7% 0% round 2rem)",
-          },
-        ],
-        {
-          duration: 600,
-          easing: "cubic-bezier(0.65, 0, 0.35, 1)",
-          fill: "forwards",
-        },
-      );
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          if (transitionId !== transitionIdRef.current) {
+            return;
+          }
 
-      transitionTimeoutRef.current = window.setTimeout(
-        finishTransition,
-        1200,
-      );
+          restoreScrollPosition();
 
-      fallbackAnimation.finished
-        .then(() => {
-          finishTransition();
-        })
-        .catch(() => {
-          finishTransition();
+          const detailsElement =
+            card.querySelector<HTMLElement>('[id$="-details"]');
+
+          if (!detailsElement) {
+            reverseOpeningAnimations();
+            return;
+          }
+
+          const collapseAnimations =
+            detailsElement.getAnimations({ subtree: true });
+
+          if (collapseAnimations.length === 0) {
+            reverseOpeningAnimations();
+            return;
+          }
+
+          let collapseFinished = false;
+
+          const continueAfterCollapse = () => {
+            if (
+              collapseFinished ||
+              transitionId !== transitionIdRef.current
+            ) {
+              return;
+            }
+
+            collapseFinished = true;
+
+            if (transitionTimeoutRef.current !== null) {
+              window.clearTimeout(transitionTimeoutRef.current);
+              transitionTimeoutRef.current = null;
+            }
+
+            reverseOpeningAnimations();
+          };
+
+          Promise.all(
+            collapseAnimations.map((animation) =>
+              animation.finished.catch(() => undefined),
+            ),
+          ).then(continueAfterCollapse);
+
+          transitionTimeoutRef.current = window.setTimeout(
+            continueAfterCollapse,
+            700,
+          );
         });
+      });
     },
     [
       activeIndex,
@@ -242,7 +323,7 @@ export default function PortfolioCarousel({
     );
   }, [activeIndex, totalItems, transitionTo]);
 
-  // Autoplay uses the same closing transition as manual navigation.
+  // Autoplay uses the same collapse and closing sequence.
   useEffect(() => {
     if (paused || totalItems <= 1) return;
 
@@ -253,6 +334,7 @@ export default function PortfolioCarousel({
     return () => window.clearInterval(interval);
   }, [advance, paused, totalItems]);
 
+  // Clear pending timers when the component unmounts.
   useEffect(() => {
     return () => {
       if (resumeTimeoutRef.current !== null) {
@@ -270,11 +352,12 @@ export default function PortfolioCarousel({
   }, []);
 
   return (
-    <>
+    <div style={{ overflowAnchor: "none" }}>
       <div
         className="
           relative
-          min-h-[500px]
+          h-[min(82vh,900px)]
+          min-h-[680px]
           w-full
         "
         style={{
@@ -290,14 +373,13 @@ export default function PortfolioCarousel({
         <div
           className="
             relative
+            h-full
             min-h-[500px]
             flex
             items-center
             justify-center
           "
-          style={{
-            perspective: "1800px",
-          }}
+          style={{ perspective: "1800px" }}
         >
           {items.map((item, index) => {
             const detailsId =
@@ -308,26 +390,17 @@ export default function PortfolioCarousel({
             const isActive = relative === 0;
             const distance = Math.abs(relative);
 
-            /*
-             * Keep only the five nearest cards in the carousel.
-             */
             if (distance > 2) {
               return null;
             }
-
-            /* =================================================
-               CENTER CARD
-               ================================================= */
 
             if (isActive) {
               return (
                 <article
                   key={item.number}
-                  className="
-                    relative
-                    z-50
-                    w-[min(92vw,780px)]
-                  "
+                  className={`relative z-50 w-[min(92vw,780px)] ${
+                    isDetailsOpen ? "h-full" : ""
+                  }`}
                   aria-label={
                     item.title
                       ? item.title +
@@ -349,19 +422,25 @@ export default function PortfolioCarousel({
                     className={`
                       portfolio-game-opening
                       rounded-[2rem]
+                      max-h-full
                       bg-gradient-to-br
                       ${item.gradient}
                       p-[1px]
                       shadow-[0_30px_100px_rgba(0,0,0,0.45)]
+                      ${isDetailsOpen ? "h-full" : ""}
                     `}
                   >
                     {item.title ? (
-                      <div className="portfolio-game-content-reveal relative overflow-hidden rounded-[2rem] bg-[#111225] p-5 sm:p-8">
+                      <div
+                        className={`portfolio-game-content-reveal relative flex max-h-full flex-col overflow-hidden rounded-[2rem] bg-[#111225] p-5 sm:p-8 ${
+                          isDetailsOpen ? "h-full" : ""
+                        }`}
+                      >
                         <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#3B4895]/20 blur-[100px]" />
 
                         <div className="pointer-events-none absolute -bottom-32 -left-28 h-72 w-72 rounded-full bg-[#DE8A61]/10 blur-[100px]" />
 
-                        <div className="relative grid items-center gap-4 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A61]/15 p-5 sm:grid-cols-[1fr_auto] sm:p-7">
+                        <div className="relative grid shrink-0 items-center gap-4 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A61]/15 p-5 sm:grid-cols-[1fr_auto] sm:p-7">
                           <div className="relative z-10">
                             <div className="mb-6 flex flex-wrap items-center gap-3">
                               <span className="font-[var(--font-rajdhani)] text-[10px] tracking-[0.24em] text-white/55">
@@ -412,6 +491,8 @@ export default function PortfolioCarousel({
                           onClick={(event) => {
                             event.stopPropagation();
 
+                            if (isClosing) return;
+
                             const shouldOpen = !isDetailsOpen;
 
                             setExpandedIndex(
@@ -427,7 +508,7 @@ export default function PortfolioCarousel({
                               resumeTimeoutRef.current = null;
                             }
                           }}
-                          className="mt-6 flex min-h-12 w-full items-center justify-between rounded-xl border border-[#F0CA77]/25 bg-[#F0CA77]/[0.045] px-4 text-left transition-colors duration-300 hover:border-[#F0CA77]/55 hover:bg-[#F0CA77]/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CA77]/70"
+                          className="mt-6 flex min-h-12 w-full shrink-0 items-center justify-between rounded-xl border border-[#F0CA77]/25 bg-[#F0CA77]/[0.045] px-4 text-left transition-colors duration-300 hover:border-[#F0CA77]/55 hover:bg-[#F0CA77]/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CA77]/70"
                         >
                           <span className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.22em] text-[#F0CA77]">
                             {isDetailsOpen ? "Show less" : "Show more"}
@@ -447,9 +528,9 @@ export default function PortfolioCarousel({
                         <div
                           id={detailsId}
                           aria-hidden={!isDetailsOpen}
-                          className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out motion-reduce:transition-none ${
+                          className={`grid min-h-0 transition-[grid-template-rows,opacity] duration-500 ease-out motion-reduce:transition-none ${
                             isDetailsOpen
-                              ? "opacity-100"
+                              ? "flex-1 opacity-100"
                               : "opacity-0"
                           }`}
                           style={{
@@ -458,7 +539,7 @@ export default function PortfolioCarousel({
                               : "0fr",
                           }}
                         >
-                          <div className="min-h-0 overflow-hidden">
+                          <div className="min-h-0 overflow-y-auto overscroll-contain">
                             <div
                               className={`transform pt-7 transition duration-500 motion-reduce:transition-none ${
                                 isDetailsOpen
@@ -676,9 +757,7 @@ export default function PortfolioCarousel({
               );
             }
 
-            /* =================================================
-               SIDE CARDS
-               ================================================= */
+            /* SIDE CARDS */
 
             const sideDirection = relative < 0 ? -1 : 1;
 
@@ -693,10 +772,7 @@ export default function PortfolioCarousel({
                 : `calc(-50% + ${horizontalOffset})`;
 
             const scale = distance === 1 ? 0.78 : 0.62;
-
-            const rotate =
-              sideDirection * (distance === 1 ? 7 : 12);
-
+            const rotate = sideDirection * (distance === 1 ? 7 : 12);
             const opacity = distance === 1 ? 0.72 : 0.35;
 
             return (
@@ -798,9 +874,7 @@ export default function PortfolioCarousel({
         </div>
       </div>
 
-      {/* =================================================
-          CONTROLS
-          ================================================= */}
+      {/* CONTROLS */}
 
       <div
         className="
@@ -930,6 +1004,6 @@ export default function PortfolioCarousel({
           Click any card to focus
         </p>
       </div>
-    </>
+    </div>
   );
 }
