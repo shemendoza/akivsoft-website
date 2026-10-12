@@ -10,19 +10,17 @@ const navigation = [
 ];
 
 const services = [
-  "Unity Game Development",
+  "2D & 3D Game Development",
   "Game Concept & Design",
-  "2D & 3D Game Creation",
-  "Multiplayer & Online Games",
-  "Mobile, PC & Console",
-  "Game Art & Animation",
-  "Optimization & Launch",
+  "Game Optimization & Launch",
+  "Application Development",
+  "Website Development",
 ];
 
 const socialLinks = [
-{ label: "GitHub", href: "https://github.com/" },
-{ label: "Facebook", href: "https://facebook.com/" },
-{ label: "Instagram", href: "https://instagram.com/" },
+{ label: "GitHub Profile", href: "https://github.com/akivsoft" },
+{ label: "Facebook Page", href: "https://www.facebook.com/akivsoft" },
+//{ label: "Instagram", href: "https://instagram.com/" },
 ];
 
 export default function Footer() {
@@ -43,7 +41,11 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
   </div>
 
   <div className="relative z-10 w-full px-6 py-14 sm:px-10 sm:py-16 lg:px-14 lg:py-20 xl:px-20 2xl:px-24">
-    <div className="grid gap-14 lg:grid-cols-[1.8fr_0.7fr_0.9fr_0.7fr] lg:items-center lg:gap-10 xl:grid-cols-[2fr_0.75fr_1fr_0.75fr] xl:gap-16">
+    
+
+<div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.8fr_0.7fr_0.9fr_0.7fr] lg:items-center lg:gap-10 xl:grid-cols-[2fr_0.75fr_1fr_0.75fr] xl:gap-16">
+
+
       {/* Brand */}
       <div>
         <div className="mb-5 flex items-center gap-3">
@@ -55,15 +57,15 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
         </div>
 
         <h2 className="max-w-4xl text-[15vw] font-normal  leading-[0.78] tracking-[-0.07em] text-white sm:text-7xl lg:text-8xl xl:text-9xl">
-          Make
+          From
           <br />
-          worlds
+          vision
           <br />
-          <span className="gradient-text">playable.</span>
+          <span className="gradient-text">to reality.</span>
         </h2>
 
         <p className="mt-7 max-w-lg text-sm leading-relaxed text-white/40 sm:text-base">
-          Playful by nature. Thoughtful by design.
+          Creative in vision. Innovative in every build.
         </p>
 
         <div className="mt-8 flex w-fit items-center gap-3 rounded-full bg-white/[0.04] px-4 py-2.5 backdrop-blur-md">

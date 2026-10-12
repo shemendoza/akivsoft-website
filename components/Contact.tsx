@@ -85,18 +85,17 @@ export default function Contact() {
             </div>
 
             <h2 className="section-title">
-              Got a game
+              Got a project
               <br />
               <span className="gradient-text">idea?</span>
             </h2>
 
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#C5BFD0] sm:text-xl">
-              Tell us the genre, target platform, or mechanic you want players
-              to experience in your Unity game.
+              Share your project goals, key features, and vision. We’ll work with you to bring your ideas to life through thoughtful design and development.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-2">
-              {["Concepts", "Prototypes", "Full game development"].map((item) => (
+              {["Games", "Applications", "Websites"].map((item) => (
                 <span
                   key={item}
                   className="rounded-full bg-[#F0CA77]/10 px-3.5 py-2 font-[var(--font-rajdhani)] text-xs font-normal  tracking-[0.12em] text-[#F0CA77] sm:text-sm"

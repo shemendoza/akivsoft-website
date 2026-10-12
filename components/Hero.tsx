@@ -476,7 +476,7 @@ export default function Hero() {
                     text-[#F0CA77]
                   "
                 >
-                  Independent Game Studio
+                  Independent Creative Studio
                 </span>
 
                 <Sparkles
@@ -506,8 +506,8 @@ export default function Hero() {
                   sm:text-lg
                 "
               >
-                We create original Unity games, pairing playful ideas with
-                expressive art and hands-on development.
+                We create original Unity games, bringing together imaginative ideas, 
+                expressive art, and hands-on development to turn concepts into engaging experiences.
               </p>
 
               <div className="mt-10 flex flex-wrap gap-4">

@@ -19,32 +19,70 @@ export default function Navbar() {
 
   useEffect(() => {
     const sections = links
-      .map(({ href }) => document.getElementById(href.slice(1)))
-      .filter((section): section is HTMLElement => section !== null);
+      .map(({ href }) => ({
+        href,
+        element: document.getElementById(href.slice(1)),
+      }))
+      .filter(
+        (section): section is {
+          href: string;
+          element: HTMLElement;
+        } => section.element !== null,
+      );
 
     const updateNavbar = () => {
       const marker = window.innerHeight * 0.34;
-      let currentSection = sections[0]?.id ?? "home";
+      let currentHref = sections[0]?.href ?? "#home";
 
       for (const section of sections) {
-        if (section.getBoundingClientRect().top <= marker) {
-          currentSection = section.id;
+        if (section.element.getBoundingClientRect().top <= marker) {
+          currentHref = section.href;
         } else {
           break;
         }
       }
 
-      setActiveHref(`#${currentSection}`);
+      setActiveHref(currentHref);
       setScrolled(window.scrollY > 24);
     };
 
+    /*
+     * Run immediately.
+     */
+
     updateNavbar();
-    window.addEventListener("scroll", updateNavbar, { passive: true });
-    window.addEventListener("resize", updateNavbar);
+
+    /*
+     * Listen for scrolling.
+     */
+
+    window.addEventListener(
+      "scroll",
+      updateNavbar,
+      {
+        passive: true,
+      },
+    );
+
+    /*
+     * Recalculate on resize.
+     */
+
+    window.addEventListener(
+      "resize",
+      updateNavbar,
+    );
 
     return () => {
-      window.removeEventListener("scroll", updateNavbar);
-      window.removeEventListener("resize", updateNavbar);
+      window.removeEventListener(
+        "scroll",
+        updateNavbar,
+      );
+
+      window.removeEventListener(
+        "resize",
+        updateNavbar,
+      );
     };
   }, []);
 
@@ -54,6 +92,10 @@ export default function Navbar() {
 
   return (
     <header className="fixed left-0 top-0 z-50 w-full">
+      {/* =================================================
+          SCROLL BACKDROP
+          ================================================= */}
+
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute inset-x-0 top-0 h-64 backdrop-blur-[2px] transition-opacity duration-500 ${
@@ -62,130 +104,275 @@ export default function Navbar() {
             : "opacity-0"
         }`}
         style={{
-          maskImage: "linear-gradient(to bottom, black 0%, black 25%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 25%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, black 0%, black 25%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, black 0%, black 25%, transparent 100%)",
         }}
       />
-      <nav className="relative z-10 w-full px-5 py-4 sm:px-8 sm:py-5 lg:px-10 lg:py-5 xl:px-14 2xl:px-20">
-        <div className="relative flex w-full items-center justify-between">
 
-          {/* =========================================================
+      {/* =================================================
+          NAVIGATION
+          ================================================= */}
+
+      <nav
+        className="
+          relative
+          z-10
+          w-full
+          px-5
+          py-4
+          sm:px-8
+          sm:py-5
+          lg:px-10
+          lg:py-5
+          xl:px-14
+          2xl:px-20
+        "
+      >
+        <div className="relative flex w-full items-center justify-between">
+          {/* =================================================
               LOGO
-          ========================================================= */}
+              ================================================= */}
+
           <a
             href="#home"
+            aria-label="AKIVSOFT Home"
             onClick={closeMenu}
-            aria-label="Akivsoft home"
-            className="group relative z-30 flex shrink-0 items-center gap-2 transition-transform duration-300 hover:scale-[1.03] sm:gap-3 xl:gap-4"
+            className="
+              relative
+              z-40
+              flex
+              shrink-0
+              items-center
+              gap-1
+              transition-transform
+              duration-300
+              hover:scale-[1.02]
+            "
           >
-            <Image
-              src="/images/a-logo.png"
-              alt=""
-              width={1800}
-              height={1800}
-              priority
-              className="h-12 w-12 object-contain sm:h-14 sm:w-14 lg:h-[72px] lg:w-[72px] xl:h-20 xl:w-20 2xl:h-24 2xl:w-24"
-            />
-            <Image
-              src="/images/akivsoft-text-img.png"
-              alt="Akivsoft"
-              width={8400}
-              height={1103}
-              priority
-              className="h-auto w-[170px] object-contain sm:w-[210px] lg:w-[235px] xl:w-[290px] 2xl:w-[330px] max-[380px]:hidden"
-            />
+            {/* A LOGO */}
+
+            <div
+              className="
+                relative
+                h-11
+                w-11
+                sm:h-12
+                sm:w-12
+                lg:h-14
+                lg:w-14
+                xl:h-16
+                xl:w-16
+                2xl:h-[4.25rem]
+                2xl:w-[4.25rem]
+              "
+            >
+              <Image
+                src="/images/a-logo.png"
+                alt="AKIVSOFT"
+                fill
+                priority
+                sizes="68px"
+                className="object-contain"
+              />
+            </div>
+
+            {/* AKIVSOFT TEXT */}
+
+            <div
+              className="
+                relative
+                h-8
+                w-[135px]
+                sm:h-9
+                sm:w-[150px]
+                lg:h-10
+                lg:w-[165px]
+                xl:h-11
+                xl:w-[180px]
+                2xl:h-12
+                2xl:w-[195px]
+              "
+            >
+              <Image
+                src="/images/akivsoft-text-img.png"
+                alt="AKIVSOFT"
+                fill
+                priority
+                sizes="195px"
+                className="object-contain object-left"
+              />
+            </div>
           </a>
 
-          {/* =========================================================
+          {/* =================================================
               DESKTOP CENTER NAVIGATION
-              
-              The navigation has its own protected space.
-              This prevents the links from visually colliding with
-              the logo or the CTA button.
-          ========================================================= */}
+              ================================================= */}
+
           <div
             className="
-              absolute left-1/2 z-20 hidden
+              absolute
+              left-1/2
+              top-1/2
+              z-20
+              hidden
+              w-[min(52vw,820px)]
               -translate-x-1/2
-              min-[1900px]:flex
+              -translate-y-1/2
+              min-[1280px]:flex
             "
           >
             <div
-              className={`
-                flex items-center
-                gap-2
-                rounded-full
-                px-2
-                py-2
-                transition-all duration-500
-                xl:gap-3
-                2xl:gap-4
-                ${scrolled ? "bg-[#15162D]/20 shadow-none backdrop-blur-sm" : "bg-[#15162D]/55 shadow-[0_12px_45px_rgba(0,0,0,0.25)] backdrop-blur-xl"}
-              `}
+              className="
+                flex
+                w-full
+                min-w-0
+                items-center
+                justify-center
+                gap-0
+                min-[1400px]:gap-0.5
+                min-[1536px]:gap-1
+                min-[1700px]:gap-1.5
+                min-[1900px]:gap-2.5
+              "
             >
               {links.map((link) => {
-                const isActive = activeHref === link.href;
+                const isActive =
+                  activeHref === link.href;
 
                 return (
                   <a
                     key={`${link.label}-${link.href}`}
                     href={link.href}
-                    aria-current={isActive ? "location" : undefined}
+                    aria-current={
+                      isActive
+                        ? "location"
+                        : undefined
+                    }
                     className={`
-                    group relative
-                    flex min-h-11 items-center justify-center
-                    whitespace-nowrap
-                    rounded-full
-                    px-4 py-2.5
-                    font-[var(--font-rajdhani)]
-                    text-[1rem]
-                    font-normal
-                    tracking-wide
-                    transition-all duration-300
-                    hover:bg-white/[0.08]
-                    hover:text-white
-                    xl:min-h-12
-                    xl:px-5
-                    xl:text-[1.05rem]
-                    2xl:px-6
-                    2xl:text-[1.1rem]
-                    ${isActive ? "bg-white/[0.06] text-[#F0CA77]" : "text-white/80"}
-                  `}
-                  >
-                    {link.label}
-
-                    <span
-                      className={`
-                      absolute bottom-1.5 left-1/2
-                      h-[2px]
-                      -translate-x-1/2
+                      group
+                      relative
+                      z-0
+                      flex
+                      min-h-8
+                      min-w-0
+                      flex-1
+                      items-center
+                      justify-center
+                      overflow-visible
+                      whitespace-nowrap
                       rounded-full
-                      bg-gradient-to-r
-                      from-[#DE8A61]
-                      via-[#F0CA77]
-                      to-white
-                      transition-all duration-300
-                      ${isActive ? "w-1/2" : "w-0 group-hover:w-1/2"}
+                      px-[clamp(0.2rem,0.4vw,0.75rem)]
+                      py-2
+                      font-[var(--font-rajdhani)]
+                      text-[clamp(0.64rem,0.64vw,0.98rem)]
+                      font-normal
+                      tracking-[0.04em]
+                      text-white/80
+                      transition-all
+                      duration-300
+                      hover:text-white
+                      ${
+                        isActive
+                          ? "text-[#F0CA77]"
+                          : ""
+                      }
                     `}
-                    />
+                  >
+                    {/* LABEL */}
 
                     <span
                       className="
-                      pointer-events-none
-                      absolute inset-0 -z-10
-                      rounded-full
-                      bg-gradient-to-r
-                      from-[#DE8A61]/0
-                      via-[#F0CA77]/0
-                      to-[#DE8A61]/0
-                      opacity-0
-                      blur-xl
-                      transition-opacity duration-300
-                      group-hover:from-[#DE8A61]/10
-                      group-hover:via-[#F0CA77]/10
-                      group-hover:to-[#DE8A61]/10
-                      group-hover:opacity-100
-                    "
+                        relative
+                        z-20
+                      "
+                    >
+                      {link.label}
+                    </span>
+
+                    {/* =================================================
+                        ACTIVE / HOVER UNDERLINE
+                        ================================================= */}
+
+                    <span
+                      aria-hidden="true"
+                      className={`
+                        pointer-events-none
+                        absolute
+                        bottom-0
+                        left-1/2
+                        z-30
+                        h-[2px]
+                        -translate-x-1/2
+                        rounded-full
+                        bg-gradient-to-r
+                        from-[#DE8A61]
+                        via-[#F0CA77]
+                        to-white
+                        shadow-[0_0_6px_rgba(240,202,119,0.5),0_0_12px_rgba(240,202,119,0.25)]
+                        transition-all
+                        duration-300
+                        ${
+                          isActive
+                            ? "w-1/2 opacity-100"
+                            : "w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-100"
+                        }
+                      `}
+                    />
+
+                    {/* =================================================
+                        ACTIVE GLOW
+                        ================================================= */}
+
+                    <span
+                      aria-hidden="true"
+                      className={`
+                        pointer-events-none
+                        absolute
+                        bottom-0
+                        left-1/2
+                        -z-10
+                        h-5
+                        -translate-x-1/2
+                        rounded-full
+                        bg-[#F0CA77]/20
+                        blur-xl
+                        transition-all
+                        duration-300
+                        ${
+                          isActive
+                            ? "w-3/4 opacity-100"
+                            : "w-0 opacity-0"
+                        }
+                      `}
+                    />
+
+                    {/* =================================================
+                        HOVER GLOW
+                        ================================================= */}
+
+                    <span
+                      aria-hidden="true"
+                      className="
+                        pointer-events-none
+                        absolute
+                        inset-0
+                        -z-20
+                        rounded-full
+                        bg-gradient-to-r
+                        from-[#DE8A61]/0
+                        via-[#F0CA77]/0
+                        to-[#DE8A61]/0
+                        opacity-0
+                        blur-xl
+                        transition-opacity
+                        duration-300
+                        group-hover:from-[#DE8A61]/10
+                        group-hover:via-[#F0CA77]/10
+                        group-hover:to-[#DE8A61]/10
+                        group-hover:opacity-100
+                      "
                     />
                   </a>
                 );
@@ -193,175 +380,307 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* =========================================================
+          {/* =================================================
               DESKTOP CTA
-          ========================================================= */}
-          <a
-            href="#contact"
+              ================================================= */}
+
+          <div
             className="
-              group relative z-30
-              hidden min-h-12
-              items-center gap-2.5
-              rounded-full
-              bg-gradient-to-r
-              from-[#DE8A61]
-              to-[#F0CA77]
-              px-6 py-3
-              font-[var(--font-rajdhani)]
-              text-base
-              font-normal
-              tracking-wide
-              text-[#15162D]
-              shadow-[0_10px_35px_rgba(222,138,97,0.2)]
-              transition-all duration-300
-              hover:-translate-y-1
-              hover:shadow-[0_16px_50px_rgba(222,138,97,0.35)]
-              min-[1900px]:flex
-              xl:min-h-14
-              xl:px-7
-              xl:text-[1.05rem]
-              2xl:px-8
-              2xl:text-[1.1rem]
+              hidden
+              shrink-0
+              items-center
+              min-[1280px]:flex
             "
           >
-            Start a Project
+            <a
+              href="#contact"
+             className="artsy-button group">
+                Start a Project
 
-            <ArrowUpRight
-              size={19}
-              strokeWidth={2.2}
-              className="
-                transition-transform duration-300
-                group-hover:-translate-y-0.5
-                group-hover:translate-x-0.5
-              "
-            />
-          </a>
 
-          {/* =========================================================
-              MOBILE MENU BUTTON
-          ========================================================= */}
+             <ArrowUpRight
+                    size={18}
+                    className="
+                      transition-transform
+                      duration-300
+                      group-hover:translate-x-1
+                      group-hover:-translate-y-1
+                    "
+                  />
+              {/* CTA SHINE */}
+
+ 
+            </a>
+          </div>
+
+          {/* =================================================
+              MOBILE / TABLET MENU BUTTON
+              ================================================= */}
+
           <button
             type="button"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={
+              open
+                ? "Close navigation"
+                : "Open navigation"
+            }
             aria-expanded={open}
-            onClick={() => setOpen((current) => !current)}
-            className={`
-              relative z-30
-              flex h-12 w-12
-              items-center justify-center
+            onClick={() =>
+              setOpen((value) => !value)
+            }
+            className="
+              relative
+              z-40
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
               rounded-full
+              border
+              border-white/10
+              bg-[#15162D]/70
               text-white
-              transition-all duration-300
-              hover:border-[#DE8A61]/50
-              hover:bg-[#DE8A61]/20
-              min-[1900px]:hidden
-              ${scrolled ? "border border-white/5 bg-white/[0.025]" : "border border-white/10 bg-white/[0.06]"}
-            `}
+              backdrop-blur-md
+              transition-all
+              duration-300
+              hover:border-[#F0CA77]/40
+              hover:text-[#F0CA77]
+              min-[1280px]:hidden
+            "
           >
-            {open ? <X size={23} /> : <Menu size={23} />}
+            {open ? (
+              <X
+                size={19}
+                aria-hidden="true"
+              />
+            ) : (
+              <Menu
+                size={19}
+                aria-hidden="true"
+              />
+            )}
           </button>
         </div>
       </nav>
 
-      {/* =========================================================
-          MOBILE MENU
-      ========================================================= */}
-      {open && (
+      {/* =================================================
+          MOBILE / TABLET MENU
+          ================================================= */}
+
+      <div
+        className={`
+          fixed
+          inset-x-0
+          top-0
+          z-30
+          min-[1280px]:hidden
+          ${
+            open
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0"
+          }
+        `}
+      >
+        {/* BACKDROP */}
+
         <div
-          className="
-            relative z-20 mx-4
+          className={`
+            absolute
+            inset-0
+            h-screen
+            bg-[#0D1023]/80
+            backdrop-blur-xl
+            transition-opacity
+            duration-300
+            ${
+              open
+                ? "opacity-100"
+                : "opacity-0"
+            }
+          `}
+          onClick={closeMenu}
+        />
+
+        {/* MENU PANEL */}
+
+        <div
+          className={`
+            relative
+            mx-4
+            mt-20
             overflow-hidden
-            rounded-3xl
-            border border-[#F0CA77]/10
+            rounded-2xl
+            border
+            border-white/10
             bg-[#15162D]/95
-            px-5 pb-6 pt-2
-            shadow-[0_25px_80px_rgba(13,16,35,0.45)]
-            backdrop-blur-2xl
+            shadow-[0_20px_80px_rgba(0,0,0,0.4)]
+            transition-all
+            duration-300
             sm:mx-6
-            min-[1900px]:hidden
-          "
+            sm:mt-24
+            ${
+              open
+                ? "translate-y-0 scale-100"
+                : "-translate-y-4 scale-[0.98]"
+            }
+          `}
         >
+          {/* DECORATIVE GLOW */}
+
           <div
+            aria-hidden="true"
             className="
               pointer-events-none
-              absolute -right-24 -top-24
-              h-64 w-64
+              absolute
+              -right-20
+              -top-20
+              h-48
+              w-48
               rounded-full
-              bg-[#DE8A61]/10
+              bg-[#F0CA77]/10
               blur-3xl
             "
           />
 
-          <div className="relative flex flex-col">
-            {links.map((link) => {
-              const isActive = activeHref === link.href;
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              -bottom-24
+              -left-20
+              h-48
+              w-48
+              rounded-full
+              bg-[#934C60]/15
+              blur-3xl
+            "
+          />
 
-              return (
-                <a
-                  key={`${link.label}-${link.href}`}
-                  href={link.href}
-                  onClick={closeMenu}
-                  aria-current={isActive ? "location" : undefined}
-                  className={`
-                  group flex items-center justify-between
-                  border-b border-white/[0.07]
-                  px-2 py-5
+          <div className="relative p-5 sm:p-7">
+            {/* MENU LABEL */}
+
+            <div className="mb-5 flex items-center gap-2">
+              <Sparkles
+                size={14}
+                className="text-[#F0CA77]"
+                aria-hidden="true"
+              />
+
+              <span
+                className="
                   font-[var(--font-rajdhani)]
-                  text-lg
-                  font-normal
-                  tracking-wide
-                  transition-colors duration-300
-                  hover:text-white
-                  ${isActive ? "text-[#F0CA77]" : "text-white/80"}
-                `}
-                >
-                  {link.label}
+                  text-[0.65rem]
+                  font-semibold
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#C5BFD0]
+                "
+              >
+                Navigation
+              </span>
+            </div>
 
-                  <ArrowUpRight
-                    size={18}
+            {/* MOBILE LINKS */}
+
+            <div className="space-y-1">
+              {links.map((link) => {
+                const isActive =
+                  activeHref === link.href;
+
+                return (
+                  <a
+                    key={`mobile-${link.label}-${link.href}`}
+                    href={link.href}
+                    aria-current={
+                      isActive
+                        ? "location"
+                        : undefined
+                    }
+                    onClick={closeMenu}
                     className={`
-                    text-white/25
-                    transition-all duration-300
-                    group-hover:-translate-y-0.5
-                    group-hover:translate-x-0.5
-                    group-hover:text-[#F0CA77]
-                      ${isActive ? "text-[#F0CA77]" : ""}
+                      group
+                      flex
+                      min-h-12
+                      items-center
+                      justify-between
+                      rounded-xl
+                      px-4
+                      font-[var(--font-rajdhani)]
+                      text-sm
+                      font-medium
+                      tracking-[0.08em]
+                      transition-all
+                      duration-300
+                      ${
+                        isActive
+                          ? "bg-[#F0CA77]/[0.07] text-[#F0CA77]"
+                          : "text-white/75 hover:bg-white/[0.04] hover:text-white"
+                      }
                     `}
-                  />
-                </a>
-              );
-            })}
+                  >
+                    <span>
+                      {link.label}
+                    </span>
 
-            <a
-              href="#contact"
-              onClick={closeMenu}
-              className="
-                mt-5
-                flex min-h-14
-                items-center justify-center
-                gap-2.5
-                rounded-full
-                bg-gradient-to-r
-                from-[#DE8A61]
-                to-[#F0CA77]
-                px-6 py-3
-                font-[var(--font-rajdhani)]
-                text-base
-                font-normal
-                tracking-wide
-                text-[#15162D]
-                shadow-[0_12px_40px_rgba(222,138,97,0.25)]
-              "
-            >
-              <Sparkles size={18} />
+                    <ArrowUpRight
+                      size={16}
+                      aria-hidden="true"
+                      className={`
+                        transition-all
+                        duration-300
+                        ${
+                          isActive
+                            ? "translate-x-0 opacity-100"
+                            : "translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                        }
+                      `}
+                    />
+                  </a>
+                );
+              })}
+            </div>
 
-              Start a Project
+            {/* MOBILE CTA */}
 
-              <ArrowUpRight size={18} />
-            </a>
+            <div className="mt-5 border-t border-white/10 pt-5">
+              <a
+                href="#contact"
+                onClick={closeMenu}
+                className="
+                  group
+                  flex
+                  min-h-12
+                  w-full
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-xl
+                  border
+                  artsy-button group
+                "
+              >
+                <span>
+                  Start a Project
+                </span>
+
+                <ArrowUpRight
+                  size={16}
+                  aria-hidden="true"
+                  className="
+                    transition-transform
+                    duration-300
+                    group-hover:translate-x-0.5
+                    group-hover:-translate-y-0.5
+                  "
+                />
+              </a>
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
