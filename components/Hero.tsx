@@ -777,7 +777,8 @@ Develop
             translate-y-[65%]
             rounded-full
             bg-[#3B4895]/25
-            blur-[100px]
+            blur-[48px]
+            sm:blur-[100px]
           "
         />
 
@@ -791,7 +792,8 @@ Develop
             translate-y-[55%]
             rounded-full
             bg-[#71527B]/15
-            blur-[100px]
+            blur-[44px]
+            sm:blur-[100px]
           "
         />
 
@@ -805,7 +807,8 @@ Develop
             translate-y-[55%]
             rounded-full
             bg-[#3B4895]/10
-            blur-[100px]
+            blur-[44px]
+            sm:blur-[100px]
           "
         />
       </div>

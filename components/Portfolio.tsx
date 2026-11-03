@@ -1,7 +1,6 @@
 "use client";
 
 import { Gamepad2, Globe, Smartphone } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import PortfolioCarousel from "@/components/PortfolioCarousel";
 import type { PortfolioItem } from "@/types/portfolio";
 
@@ -157,103 +156,8 @@ const otherServiceItems: PortfolioItem[] = [
 ];
 
 export default function Portfolio() {
-  const [revealProgress, setRevealProgress] = useState(0);
-  const portfolioRef = useRef<HTMLElement | null>(null);
-
-  /* ========================================================
-     SCROLL REVEAL
-     ======================================================== */
-
-  useEffect(() => {
-    let ticking = false;
-
-    const updateReveal = () => {
-      const section = portfolioRef.current;
-
-      if (!section) {
-        ticking = false;
-        return;
-      }
-
-      const rect =
-        section.getBoundingClientRect();
-
-      const viewportHeight =
-        window.innerHeight;
-
-      const start =
-        viewportHeight * 0.95;
-
-      const end =
-        viewportHeight * 0.25;
-
-      const progress = Math.min(
-        Math.max(
-          (start - rect.top) /
-            (start - end),
-          0,
-        ),
-        1,
-      );
-
-      setRevealProgress(progress);
-
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (ticking) {
-        return;
-      }
-
-      ticking = true;
-
-      window.requestAnimationFrame(
-        updateReveal,
-      );
-    };
-
-    updateReveal();
-
-    window.addEventListener(
-      "scroll",
-      handleScroll,
-      { passive: true },
-    );
-
-    window.addEventListener(
-      "resize",
-      handleScroll,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "scroll",
-        handleScroll,
-      );
-
-      window.removeEventListener(
-        "resize",
-        handleScroll,
-      );
-    };
-  }, []);
-
-  /* ========================================================
-     VISUAL VALUES
-     ======================================================== */
-
-  const contentOpacity =
-    0.35 + revealProgress * 0.65;
-
-  const contentTranslate =
-    (1 - revealProgress) * 70;
-
-  const atmosphereOpacity =
-    0.35 + revealProgress * 0.65;
   return (
     <section
-      ref={portfolioRef}
       id="portfolio"
       className="
         artsy-background
@@ -293,12 +197,10 @@ export default function Portfolio() {
             -translate-x-1/2
             rounded-full
             bg-[#3B4895]/20
-            blur-[110px]
+            blur-[48px]
+            sm:blur-[110px]
           "
-          style={{
-            opacity:
-              atmosphereOpacity,
-          }}
+          style={{ opacity: 0.7 }}
         />
 
         <div
@@ -310,12 +212,10 @@ export default function Portfolio() {
             w-[30vw]
             rounded-full
             bg-[#71527B]/15
-            blur-[100px]
+            blur-[44px]
+            sm:blur-[100px]
           "
-          style={{
-            opacity:
-              atmosphereOpacity,
-          }}
+          style={{ opacity: 0.7 }}
         />
 
         <div
@@ -327,12 +227,10 @@ export default function Portfolio() {
             w-[25vw]
             rounded-full
             bg-[#3B4895]/10
-            blur-[100px]
+            blur-[44px]
+            sm:blur-[100px]
           "
-          style={{
-            opacity:
-              atmosphereOpacity,
-          }}
+          style={{ opacity: 0.7 }}
         />
       </div>
 
@@ -404,7 +302,8 @@ export default function Portfolio() {
             w-48
             rounded-full
             bg-[#F0CA77]/5
-            blur-[100px]
+            blur-[44px]
+            sm:blur-[100px]
           "
         />
       </div>
@@ -435,23 +334,14 @@ export default function Portfolio() {
     relative
     z-10
     w-full
+    portfolio-scroll-reveal
   "
-  style={{
-    opacity: contentOpacity,
-    transform: `translate3d(
-      0,
-      ${contentTranslate}px,
-      0
-    )`,
-    transition:
-      "opacity 120ms linear, transform 120ms linear",
-  }}
 >
   {/* =================================================
       UNITY GAMES
       ================================================= */}
 
-  <div className="mt-20 sm:mt-24">
+  <div className="mt-14 sm:mt-24">
     <div className="mb-8 flex items-center gap-3">
       <span className="pixel-dot" />
 
@@ -477,7 +367,7 @@ export default function Portfolio() {
       DIVIDER BETWEEN PORTFOLIO CATEGORIES
       ================================================= */}
 
-  <div className="my-20 sm:my-28">
+  <div className="my-14 sm:my-24 lg:my-28">
     <div className="h-px w-full bg-white/10" />
   </div>
 

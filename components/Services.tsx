@@ -2,18 +2,13 @@
 
 import {
   ArrowUpRight,
-  AudioLines,
-  Box,
   Gamepad2,
   Gauge,
   Globe,
   Lightbulb,
-  Monitor,
-  Palette,
   Rocket,
   Smartphone,
   Sparkles,
-  Users,
 } from "lucide-react";
 import ServiceCard from "./ServiceCard";
 
@@ -139,7 +134,7 @@ export default function Services() {
       </div>
 
 <div className="section-container relative z-10">
-  <header className="mb-14 grid min-h-[65vh] content-center gap-8 xl:mb-20 xl:grid-cols-[1fr_1fr] xl:items-center">
+  <header className="mb-10 grid min-h-[45vh] content-center gap-8 sm:mb-14 sm:min-h-[65vh] xl:mb-20 xl:grid-cols-[1fr_1fr] xl:items-center">
     <div>
       <div className="mb-5 flex items-center gap-3">
         <Gamepad2 size={17} className="text-[#DE8A61]" />
@@ -206,7 +201,7 @@ export default function Services() {
         </div>
 
 
-        <div className="mt-20 grid gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:items-center">
+        <div className="mt-14 grid gap-10 sm:mt-20 xl:grid-cols-[0.85fr_1.15fr] xl:items-center">
   <div>
     <div className="mb-5 flex items-center gap-3">
       <span className="pixel-dot" />
@@ -230,9 +225,9 @@ export default function Services() {
   </div>
 
   <div className="artsy-card relative overflow-hidden p-6 sm:p-8 lg:p-10">
-    <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#3B4895]/20 blur-3xl" />
+    <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#3B4895]/20 blur-2xl sm:blur-3xl" />
 
-    <div className="pointer-events-none absolute -bottom-24 left-[25%] h-48 w-48 rounded-full bg-[#DE8A61]/10 blur-3xl" />
+    <div className="pointer-events-none absolute -bottom-24 left-[25%] h-48 w-48 rounded-full bg-[#DE8A61]/10 blur-2xl sm:blur-3xl" />
 
     <div className="art-grid pointer-events-none absolute inset-0 opacity-20" />
 
@@ -263,11 +258,11 @@ export default function Services() {
 </div>
 
 
-          <div className="my-20 sm:my-28">
+          <div className="my-14 sm:my-28">
     <div className="h-px w-full bg-white/10" />
   </div>
 
-        <div className="relative mt-20 sm:mt-28">
+        <div className="relative mt-14 sm:mt-28">
   <div className="flex items-center justify-between gap-4 py-4">
     <p className="font-[var(--font-rajdhani)] text-xs font-normal tracking-[0.25em] text-white/55 sm:text-sm">
       Other development services
@@ -287,11 +282,11 @@ export default function Services() {
 </div>
 
         
-<div className="mt-20 grid gap-10 xl:grid-cols-[1.15fr_0.85fr] xl:items-center">
+<div className="mt-14 grid gap-10 sm:mt-20 xl:grid-cols-[1.15fr_0.85fr] xl:items-center">
   <div className="artsy-card relative overflow-hidden p-6 sm:p-8 lg:p-10">
-    <div className="pointer-events-none absolute -left-16 -top-20 h-56 w-56 rounded-full bg-[#71527B]/20 blur-3xl" />
+    <div className="pointer-events-none absolute -left-16 -top-20 h-56 w-56 rounded-full bg-[#71527B]/20 blur-2xl sm:blur-3xl" />
 
-    <div className="pointer-events-none absolute -bottom-24 right-[20%] h-48 w-48 rounded-full bg-[#F0CA77]/10 blur-3xl" />
+    <div className="pointer-events-none absolute -bottom-24 right-[20%] h-48 w-48 rounded-full bg-[#F0CA77]/10 blur-2xl sm:blur-3xl" />
 
     <div className="art-grid pointer-events-none absolute inset-0 opacity-20" />
 
@@ -379,10 +374,10 @@ export default function Services() {
 
 
 
-        <div className="artsy-card relative mt-20 overflow-hidden p-7 sm:p-10 lg:p-14">
-  <div className="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full bg-[#71527B]/20 blur-3xl" />
+        <div className="artsy-card relative mt-14 overflow-hidden p-7 sm:mt-20 sm:p-10 lg:p-14">
+  <div className="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full bg-[#71527B]/20 blur-2xl sm:blur-3xl" />
 
-  <div className="pointer-events-none absolute -bottom-32 left-[35%] h-64 w-64 rounded-full bg-[#DE8A61]/15 blur-3xl" />
+  <div className="pointer-events-none absolute -bottom-32 left-[35%] h-64 w-64 rounded-full bg-[#DE8A61]/15 blur-2xl sm:blur-3xl" />
 
   <div className="art-grid pointer-events-none absolute inset-0 opacity-20" />
 

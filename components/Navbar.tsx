@@ -30,7 +30,7 @@ export default function Navbar() {
         } => section.element !== null,
       );
 
-    const updateNavbar = () => {
+    const updateActiveSection = () => {
       const marker = window.innerHeight * 0.34;
       let currentHref = sections[0]?.href ?? "#home";
 
@@ -42,47 +42,64 @@ export default function Navbar() {
         }
       }
 
-      setActiveHref(currentHref);
-      setScrolled(window.scrollY > 24);
+      setActiveHref((current) =>
+        current === currentHref ? current : currentHref,
+      );
     };
 
-    /*
-     * Run immediately.
-     */
+    const updateScrolledState = () => {
+      const nextIsScrolled = window.scrollY > 24;
 
-    updateNavbar();
+      setScrolled((current) =>
+        current === nextIsScrolled ? current : nextIsScrolled,
+      );
+    };
 
-    /*
-     * Listen for scrolling.
-     */
+    let activeSectionObserver: IntersectionObserver | null = null;
 
-    window.addEventListener(
-      "scroll",
-      updateNavbar,
-      {
-        passive: true,
-      },
-    );
+    const observeActiveSection = () => {
+      activeSectionObserver?.disconnect();
 
-    /*
-     * Recalculate on resize.
-     */
+      if (!("IntersectionObserver" in window)) {
+        updateActiveSection();
+        return;
+      }
 
-    window.addEventListener(
-      "resize",
-      updateNavbar,
-    );
+      const marker = Math.round(window.innerHeight * 0.34);
+      const belowMarker = Math.max(0, window.innerHeight - marker - 1);
+
+      activeSectionObserver = new IntersectionObserver(
+        updateActiveSection,
+        {
+          rootMargin: `-${marker}px 0px -${belowMarker}px 0px`,
+          threshold: 0,
+        },
+      );
+
+      sections.forEach(({ element }) => {
+        activeSectionObserver?.observe(element);
+      });
+
+      updateActiveSection();
+    };
+
+    const handleResize = () => {
+      observeActiveSection();
+      updateScrolledState();
+    };
+
+    observeActiveSection();
+    updateScrolledState();
+
+    window.addEventListener("scroll", updateScrolledState, {
+      passive: true,
+    });
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener(
-        "scroll",
-        updateNavbar,
-      );
-
-      window.removeEventListener(
-        "resize",
-        updateNavbar,
-      );
+      activeSectionObserver?.disconnect();
+      window.removeEventListener("scroll", updateScrolledState);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -435,8 +452,8 @@ export default function Navbar() {
               relative
               z-40
               flex
-              h-10
-              w-10
+              h-11
+              w-11
               shrink-0
               items-center
               justify-center
@@ -494,7 +511,7 @@ export default function Navbar() {
             inset-0
             h-screen
             bg-[#0D1023]/80
-            backdrop-blur-xl
+            backdrop-blur-md
             transition-opacity
             duration-300
             ${

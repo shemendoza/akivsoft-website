@@ -43,7 +43,7 @@ export default function About() {
       id="about"
       className="relative overflow-hidden py-20 sm:py-24 md:py-36"
     ><div className="section-container relative z-10">
-  <header className="mb-16 grid min-h-[65vh] content-center gap-10 xl:mb-24 xl:grid-cols-[1.15fr_0.85fr] xl:items-center">
+  <header className="mb-10 grid min-h-[45vh] content-center gap-10 sm:mb-16 sm:min-h-[65vh] xl:mb-24 xl:grid-cols-[1.15fr_0.85fr] xl:items-center">
     <div>
       <div className="mb-5 flex items-center gap-3">
         <span className="pixel-dot" />
@@ -121,7 +121,7 @@ export default function About() {
           <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#3B4895]/20 via-[#71527B]/10 to-[#15162D]/55 p-6 shadow-[0_20px_70px_rgba(13,16,35,0.28)] sm:p-8">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -right-12 -top-16 size-40 rounded-full bg-[#3B4895]/20 blur-3xl"
+              className="pointer-events-none absolute -right-12 -top-16 size-40 rounded-full bg-[#3B4895]/20 blur-2xl sm:blur-3xl"
             />
             <div
               aria-hidden="true"
@@ -172,7 +172,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="mt-20 sm:mt-24 md:mt-32" aria-labelledby="akiv-values-title">
+        <section className="mt-14 sm:mt-24 md:mt-32" aria-labelledby="akiv-values-title">
           <div className="mb-8 grid gap-6 md:grid-cols-[1fr_1fr] md:items-end">
             <div>
               <div className="mb-5 flex items-center gap-3">
@@ -222,7 +222,7 @@ export default function About() {
 
         </section>
 
-        <section className="mt-20 grid gap-10 sm:mt-24 md:mt-32 xl:grid-cols-[0.85fr_1.15fr] xl:items-center">
+        <section className="mt-14 grid gap-10 sm:mt-24 md:mt-32 xl:grid-cols-[0.85fr_1.15fr] xl:items-center">
          <div>
   <div className="mb-5 flex items-center gap-3">
     <Gamepad2 size={17} className="text-[#DE8A61]" />
@@ -296,7 +296,7 @@ export default function About() {
         </section>
 
         <section
-  className="mt-20 grid gap-5 sm:mt-24 md:mt-32 xl:grid-cols-2"
+  className="mt-14 grid gap-5 sm:mt-24 md:mt-32 xl:grid-cols-2"
   aria-label="Our vision and journey"
 >
   <article className={`${framedPanelClassName} p-6 sm:p-8`}>
@@ -376,7 +376,7 @@ export default function About() {
   </article>
 </section>
 
-       <div className="relative mt-24 sm:mt-32 md:mt-40">
+       <div className="relative mt-16 sm:mt-32 md:mt-40">
   <div className="relative">
     <div className="mb-6 flex items-center gap-3">
       <span className="pixel-dot" />

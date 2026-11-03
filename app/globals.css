@@ -571,6 +571,38 @@ section::before {
   line-height: 1.02;
 }
 
+.portfolio-scroll-reveal {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes portfolio-scroll-reveal {
+  from {
+    opacity: 0.35;
+    transform: translate3d(0, 70px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .portfolio-scroll-reveal {
+      view-timeline-name: --portfolio-content;
+      view-timeline-axis: block;
+      animation-name: portfolio-scroll-reveal;
+      animation-duration: 1s;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --portfolio-content;
+      animation-range: entry 0% entry 18%;
+    }
+  }
+}
+
 /* =========================================================
    CARDS
    ========================================================= */
@@ -1082,6 +1114,12 @@ section::before {
   animation: portfolio-game-content 360ms ease-out 650ms both;
 }
 
+.portfolio-carousel[data-in-view="false"] .portfolio-game-opening,
+.portfolio-carousel[data-in-view="false"] .portfolio-game-opening::before,
+.portfolio-carousel[data-in-view="false"] .portfolio-game-content-reveal {
+  animation-play-state: paused;
+}
+
 @keyframes portfolio-gamebox-open {
   0% {
     clip-path: inset(49.5% 0 49.5% round 2rem);
@@ -1252,11 +1290,6 @@ section::before {
     background-size: 42px 42px;
   }
 
-  .blob {
-    opacity: 0.65;
-    filter: blur(4px);
-  }
-
   .showcase-card {
     transform: scale(0.9);
   }
@@ -1266,9 +1299,61 @@ section::before {
   }
 }
 
+@media (max-width: 767px) {
+  .artsy-card {
+    backdrop-filter: none;
+  }
+
+  .art-grid {
+    animation: none;
+  }
+
+  .blob {
+    filter: none;
+    animation: none;
+  }
+
+  .noise {
+    display: none;
+  }
+
+  .gradient-text,
+  .pixel-dot {
+    animation: none;
+  }
+
+  .falling-leaf {
+    filter: none;
+    will-change: auto;
+  }
+
+  .portfolio-game-opening {
+    animation-name: portfolio-gamebox-open-mobile;
+    animation-duration: 680ms;
+    will-change: transform, opacity;
+  }
+
+  @keyframes portfolio-gamebox-open-mobile {
+    from {
+      opacity: 0.7;
+      transform: scaleY(0.94);
+    }
+
+    72% {
+      opacity: 1;
+      transform: scaleY(1.012);
+    }
+
+    to {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+}
+
 @media (max-width: 480px) {
   .section-container {
-    padding-inline: 18px;
+    padding-inline: 20px;
   }
 
   .art-grid {
@@ -1365,5 +1450,11 @@ section::before {
   .portfolio-card-opening,
   .portfolio-card-opening::after {
     animation: none;
+  }
+
+  .portfolio-scroll-reveal {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
   }
 }

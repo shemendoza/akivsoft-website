@@ -40,7 +40,7 @@ return ( <footer className="artsy-background relative overflow-hidden"> <div cla
     <div className="pixel-dot absolute right-[8%] bottom-[25%]" />
   </div>
 
-  <div className="relative z-10 w-full px-6 py-14 sm:px-10 sm:py-16 lg:px-14 lg:py-20 xl:px-20 2xl:px-24">
+  <div className="relative z-10 w-full px-5 py-14 sm:px-10 sm:py-16 lg:px-14 lg:py-20 xl:px-20 2xl:px-24">
     
 
 <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.8fr_0.7fr_0.9fr_0.7fr] lg:items-center lg:gap-10 xl:grid-cols-[2fr_0.75fr_1fr_0.75fr] xl:gap-16">

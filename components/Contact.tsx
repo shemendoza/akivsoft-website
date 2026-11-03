@@ -147,8 +147,8 @@ export default function Contact() {
 
           <div className="relative">
             <div className="artsy-card relative overflow-hidden p-5 sm:p-7 md:p-9">
-              <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#DE8A61]/10 blur-3xl" />
-              <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-[#3B4895]/15 blur-3xl" />
+              <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#DE8A61]/10 blur-2xl sm:blur-3xl" />
+              <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-[#3B4895]/15 blur-2xl sm:blur-3xl" />
               <div className="relative">
                 <div className="mb-8 flex items-center justify-between gap-4">
                   <div>

@@ -37,19 +37,23 @@ export default function PortfolioCarousel({
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isPageScrolling, setIsPageScrolling] = useState(false);
+  const [isInView, setIsInView] = useState(false);
 
   const paused =
     isHovered ||
     isManuallyPaused ||
     isClosing ||
-    isPageScrolling;
+    isPageScrolling ||
+    !isInView;
 
   const isDetailsOpen = expandedIndex === activeIndex;
 
   const resumeTimeoutRef = useRef<number | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
   const pageScrollTimeoutRef = useRef<number | null>(null);
+  const carouselRef = useRef<HTMLDivElement | null>(null);
   const activeCardRef = useRef<HTMLDivElement | null>(null);
+  const pageScrollStartedRef = useRef(false);
   const transitionIdRef = useRef(0);
 
   const getRelativePosition = useCallback(
@@ -80,30 +84,69 @@ export default function PortfolioCarousel({
     }, 5000);
   }, []);
 
+  useEffect(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) return;
+
+    if (!("IntersectionObserver" in window)) {
+      const fallbackFrame = requestAnimationFrame(() => {
+        setIsInView(true);
+      });
+
+      return () => cancelAnimationFrame(fallbackFrame);
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      const nextIsInView = Boolean(entry?.isIntersecting);
+
+      if (!nextIsInView) {
+        if (pageScrollTimeoutRef.current !== null) {
+          window.clearTimeout(pageScrollTimeoutRef.current);
+          pageScrollTimeoutRef.current = null;
+        }
+
+        pageScrollStartedRef.current = false;
+        setIsPageScrolling(false);
+      }
+
+      setIsInView((current) =>
+        current === nextIsInView ? current : nextIsInView,
+      );
+    }, {
+      rootMargin: "100px 0px",
+      threshold: 0,
+    });
+
+    observer.observe(carousel);
+
+    return () => observer.disconnect();
+  }, []);
+
   /*
    * Pause autoplay while the user scrolls the page.
    * This prevents card transitions from interfering with
    * smooth scrolling and other vertically animated sections.
    */
   useEffect(() => {
-    let mounted = true;
+    if (!isInView) return;
 
     const handlePageScroll = () => {
-      if (!mounted) return;
-
-      setIsPageScrolling(true);
+      if (!pageScrollStartedRef.current) {
+        pageScrollStartedRef.current = true;
+        setIsPageScrolling(true);
+      }
 
       if (pageScrollTimeoutRef.current !== null) {
         window.clearTimeout(pageScrollTimeoutRef.current);
+        pageScrollTimeoutRef.current = null;
       }
 
       pageScrollTimeoutRef.current = window.setTimeout(() => {
         pageScrollTimeoutRef.current = null;
-
-        if (mounted) {
-          setIsPageScrolling(false);
-        }
-      }, 1200);
+        pageScrollStartedRef.current = false;
+        setIsPageScrolling(false);
+      }, 180);
     };
 
     window.addEventListener("scroll", handlePageScroll, {
@@ -111,16 +154,16 @@ export default function PortfolioCarousel({
     });
 
     return () => {
-      mounted = false;
-
       window.removeEventListener("scroll", handlePageScroll);
 
       if (pageScrollTimeoutRef.current !== null) {
         window.clearTimeout(pageScrollTimeoutRef.current);
         pageScrollTimeoutRef.current = null;
       }
+
+      pageScrollStartedRef.current = false;
     };
-  }, []);
+  }, [isInView]);
 
   /**
    * Collapse the expanded details before reversing the card's
@@ -357,6 +400,8 @@ export default function PortfolioCarousel({
   }, [advance, paused, totalItems]);
 
   useEffect(() => {
+    const transitionId = transitionIdRef;
+
     return () => {
       if (resumeTimeoutRef.current !== null) {
         window.clearTimeout(resumeTimeoutRef.current);
@@ -370,18 +415,25 @@ export default function PortfolioCarousel({
         window.clearTimeout(pageScrollTimeoutRef.current);
       }
 
-      transitionIdRef.current++;
+      transitionId.current++;
     };
   }, []);
 
   return (
-    <div style={{ overflowAnchor: "none" }}>
+    <div
+      ref={carouselRef}
+      className="portfolio-carousel"
+      data-in-view={isInView}
+      style={{ overflowAnchor: "none" }}
+    >
       <div
         className="
           relative
-          h-[min(82vh,900px)]
-          min-h-[680px]
+          h-auto
+          min-h-[520px]
           w-full
+          md:h-[min(82vh,900px)]
+          md:min-h-[680px]
         "
         style={{
           "--carousel-step": "clamp(245px, 32vw, 540px)",
@@ -397,7 +449,8 @@ export default function PortfolioCarousel({
           className="
             relative
             h-full
-            min-h-[500px]
+            min-h-[480px]
+            md:min-h-[500px]
             flex
             items-center
             justify-center
@@ -421,7 +474,7 @@ export default function PortfolioCarousel({
               return (
                 <article
                   key={item.number}
-                  className="relative z-50 w-[min(92vw,780px)]"
+                  className="relative z-50 w-full max-w-[780px]"
                   aria-label={
                     item.title
                       ? item.title +
@@ -454,9 +507,9 @@ export default function PortfolioCarousel({
                       <div
                         className="portfolio-game-content-reveal relative flex max-h-full flex-col overflow-hidden rounded-[2rem] bg-[#111225] p-5 sm:p-8"
                       >
-                        <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#3B4895]/20 blur-[100px]" />
+                        <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#3B4895]/20 blur-[44px] sm:blur-[100px]" />
 
-                        <div className="pointer-events-none absolute -bottom-32 -left-28 h-72 w-72 rounded-full bg-[#DE8A61]/10 blur-[100px]" />
+                        <div className="pointer-events-none absolute -bottom-32 -left-28 h-72 w-72 rounded-full bg-[#DE8A61]/10 blur-[44px] sm:blur-[100px]" />
 
                         <div
                           aria-hidden={isDetailsOpen}
@@ -978,19 +1031,33 @@ export default function PortfolioCarousel({
                   index === activeIndex ? "true" : undefined
                 }
                 className={`
-                  h-1.5
+                  flex
+                  h-11
+                  w-11
                   cursor-pointer
+                  group
+                  items-center
+                  justify-center
                   rounded-full
-                  transition-all
-                  duration-300
                   disabled:cursor-not-allowed
-                  ${
-                    index === activeIndex
-                      ? "w-8 bg-[#F0CA77]"
-                      : "w-1.5 bg-white/20 hover:bg-white/50"
-                  }
                 `}
-              />
+              >
+                <span
+                  aria-hidden="true"
+                  className={`
+                    block
+                    h-1.5
+                    rounded-full
+                    transition-all
+                    duration-300
+                    ${
+                      index === activeIndex
+                        ? "w-8 bg-[#F0CA77]"
+                        : "w-1.5 bg-white/20 group-hover:bg-white/50"
+                    }
+                  `}
+                />
+              </button>
             ))}
           </div>
 
