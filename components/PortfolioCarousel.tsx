@@ -421,9 +421,7 @@ export default function PortfolioCarousel({
               return (
                 <article
                   key={item.number}
-                  className={`relative z-50 w-[min(92vw,780px)] ${
-                    isDetailsOpen ? "h-full" : ""
-                  }`}
+                  className="relative z-50 w-[min(92vw,780px)]"
                   aria-label={
                     item.title
                       ? item.title +
@@ -450,20 +448,26 @@ export default function PortfolioCarousel({
                       ${item.gradient}
                       p-[1px]
                       shadow-[0_30px_100px_rgba(0,0,0,0.45)]
-                      ${isDetailsOpen ? "h-full" : ""}
                     `}
                   >
                     {item.title ? (
                       <div
-                        className={`portfolio-game-content-reveal relative flex max-h-full flex-col overflow-hidden rounded-[2rem] bg-[#111225] p-5 sm:p-8 ${
-                          isDetailsOpen ? "h-full" : ""
-                        }`}
+                        className="portfolio-game-content-reveal relative flex max-h-full flex-col overflow-hidden rounded-[2rem] bg-[#111225] p-5 sm:p-8"
                       >
                         <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#3B4895]/20 blur-[100px]" />
 
                         <div className="pointer-events-none absolute -bottom-32 -left-28 h-72 w-72 rounded-full bg-[#DE8A61]/10 blur-[100px]" />
 
-                        <div className="relative grid shrink-0 items-center gap-4 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A61]/15 p-5 sm:grid-cols-[1fr_auto] sm:p-7">
+                        <div
+                          aria-hidden={isDetailsOpen}
+                          inert={isDetailsOpen}
+                          className={`relative z-10 flex flex-col transition-opacity duration-300 ease-in-out motion-reduce:transition-none ${
+                            isDetailsOpen
+                              ? "pointer-events-none opacity-0"
+                              : "opacity-100"
+                          }`}
+                        >
+                          <div className="relative grid shrink-0 items-center gap-4 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A61]/15 p-5 sm:grid-cols-[1fr_auto] sm:p-7">
                           <div className="relative z-10">
                             <div className="mb-6 flex flex-wrap items-center gap-3">
                               <span className="font-[var(--font-rajdhani)] text-[10px] tracking-[0.24em] text-white/55">
@@ -505,24 +509,19 @@ export default function PortfolioCarousel({
                               />
                             </div>
                           )}
-                        </div>
+                          </div>
 
                         <button
                           type="button"
-                          aria-expanded={isDetailsOpen}
+                          aria-expanded={false}
                           aria-controls={detailsId}
                           onClick={(event) => {
                             event.stopPropagation();
 
                             if (isClosing) return;
 
-                            const shouldOpen = !isDetailsOpen;
-
-                            setExpandedIndex(
-                              shouldOpen ? index : null,
-                            );
-
-                            setIsManuallyPaused(shouldOpen);
+                            setExpandedIndex(index);
+                            setIsManuallyPaused(true);
 
                             if (resumeTimeoutRef.current !== null) {
                               window.clearTimeout(
@@ -534,41 +533,30 @@ export default function PortfolioCarousel({
                           className="mt-6 flex min-h-12 w-full shrink-0 items-center justify-between rounded-xl border border-[#F0CA77]/25 bg-[#F0CA77]/[0.045] px-4 text-left transition-colors duration-300 hover:border-[#F0CA77]/55 hover:bg-[#F0CA77]/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CA77]/70"
                         >
                           <span className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.22em] text-[#F0CA77]">
-                            {isDetailsOpen ? "Show less" : "Show more"}
+                            Show more
                           </span>
 
                           <ChevronDown
                             size={17}
                             aria-hidden="true"
-                            className={`text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none ${
-                              isDetailsOpen
-                                ? "rotate-180"
-                                : "rotate-0"
-                            }`}
+                            className="text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none"
                           />
                         </button>
+                        </div>
 
                         <div
                           id={detailsId}
                           aria-hidden={!isDetailsOpen}
-                          className={`grid min-h-0 transition-[grid-template-rows,opacity] duration-500 ease-out motion-reduce:transition-none ${
+                          inert={!isDetailsOpen}
+                          className={`absolute inset-0 z-10 flex min-h-0 flex-col rounded-[2rem] bg-[#111225] p-5 transition-opacity duration-300 ease-in-out motion-reduce:transition-none sm:p-8 ${
                             isDetailsOpen
-                              ? "flex-1 opacity-100"
-                              : "opacity-0"
+                              ? "opacity-100"
+                              : "pointer-events-none opacity-0"
                           }`}
-                          style={{
-                            gridTemplateRows: isDetailsOpen
-                              ? "1fr"
-                              : "0fr",
-                          }}
                         >
-                          <div className="min-h-0 overflow-y-auto overscroll-contain">
+                          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                             <div
-                              className={`transform pt-7 transition duration-500 motion-reduce:transition-none ${
-                                isDetailsOpen
-                                  ? "translate-y-0"
-                                  : "-translate-y-2"
-                              }`}
+                              className="pt-7 transition-transform duration-300 motion-reduce:transition-none"
                             >
                               <section className="relative">
                                 <h4 className="mb-3 font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.26em] text-[#DE8A61]">
@@ -746,7 +734,6 @@ export default function PortfolioCarousel({
                               )}
                             </div>
                           </div>
-                        </div>
 
                         {item.platforms?.length ? (
                           <div className="mt-5 flex justify-start border-t border-white/[0.06] pt-4">
@@ -755,6 +742,32 @@ export default function PortfolioCarousel({
                             </span>
                           </div>
                         ) : null}
+
+                          <button
+                            type="button"
+                            aria-expanded={isDetailsOpen}
+                            aria-controls={detailsId}
+                            onClick={(event) => {
+                              event.stopPropagation();
+
+                              if (isClosing) return;
+
+                              setExpandedIndex(null);
+                              setIsManuallyPaused(false);
+                            }}
+                            className="mt-4 flex min-h-12 w-full shrink-0 items-center justify-between rounded-xl border border-[#F0CA77]/25 bg-[#F0CA77]/[0.045] px-4 text-left transition-colors duration-300 hover:border-[#F0CA77]/55 hover:bg-[#F0CA77]/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CA77]/70"
+                          >
+                            <span className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.22em] text-[#F0CA77]">
+                              Show less
+                            </span>
+
+                            <ChevronDown
+                              size={17}
+                              aria-hidden="true"
+                              className="rotate-180 text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none"
+                            />
+                          </button>
+                      </div>
                       </div>
                     ) : (
                       <div className="portfolio-game-content-reveal relative flex min-h-[340px] flex-col items-center justify-center overflow-hidden rounded-[2rem] bg-[#111225] p-8 text-center sm:min-h-[400px]">

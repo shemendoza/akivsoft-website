@@ -7,69 +7,70 @@ import type { PortfolioItem } from "@/types/portfolio";
 
 const portfolioItems: PortfolioItem[] = [
   {
-    number: "01",
-    detailsId: "cosmic-dodge-details",
-    closing: {
-      prompt: "How long can you survive the cosmic chaos?",
-      subline: "Enter the void. Take flight. Dodge everything.",
-      brand: "Cosmic Dodge",
-      tagline: "How long can you stay alive?",
-    },
-    title: "Cosmic Dodge",
-    image: "/unity-images/1.jpeg",
-    tagline: "Dodge. Fly. Survive.",
-    description: [
-      "Take control of your astronaut and navigate through a dangerous cosmic field filled with massive asteroids and unpredictable space debris!",
-      "In Cosmic Dodge, your astronaut constantly flies upward on an endless journey. Tap and hold the screen to dive downward; release to rise again, then carefully maneuver around incoming obstacles.",
-      "Watch out for massive asteroid formations blocking your path, while smaller asteroids appear unexpectedly from different directions. Every collision costs you a life, and you have only three lives, so survive as long as possible.",
-      "The longer you survive, the more intense the challenge becomes.",
-    ],
-    features: [
-      {
-        icon: "\u{1F30C}",
-        title: "Endless Space Adventure",
-        description: "Fly through an ever-changing cosmic environment.",
-      },
-      {
-        icon: "\u2604\uFE0F",
-        title: "Dodge Massive Asteroids",
-        description: "Navigate through dangerous asteroid formations.",
-      },
-      {
-        icon: "\u{1F4AB}",
-        title: "Quick Tap Controls",
-        description: "Hold to dive and release to rise.",
-      },
-      {
-        icon: "\u2764\uFE0F",
-        title: "Three Lives",
-        description: "Make every move count.",
-      },
-      {
-        icon: "\u{1F3AE}",
-        title: "Arcade-Style Gameplay",
-        description: "Easy to learn, challenging to master.",
-      },
-      {
-        icon: "\u{1F3C6}",
-        title: "Survive as Long as You Can",
-        description: "Push your limits and beat your best run.",
-      },
-    ],
-    genre: "Arcade",
-    secondaryGenres: [
-      "Action",
-      "Casual",
-      "Endless Runner",
-      "Survival",
-      "Space",
-    ],
-   platforms: ["Android"],
 
-    availability: "Coming soon",
-    
-    icon: Gamepad2,
-    gradient: "from-[#3B4895] to-[#DE8A61]",
+  number: "01",
+  detailsId: "cosmic-shunner-details",
+  closing: {
+    prompt: "Can you survive the infinite void?",
+    subline: "Enter the cosmos. Face the chaos. Dodge everything.",
+    brand: "Cosmic Shunner",
+    tagline: "Survive the infinite void by dodging everything it throws at you.",
+  },
+  title: "Cosmic Shunner",
+  image: "/unity-images/1.jpeg",
+  tagline: "Fly. Survive. Outlast.",
+  description: [
+    "Survive the infinite void by dodging everything it throws at you.",
+    "Take control of your astronaut and navigate through a dangerous cosmic field filled with massive asteroid formations and unpredictable space debris. Every moment tests your reflexes as you maneuver through deadly obstacles and fight to stay alive.",
+    "Your astronaut constantly flies upward on an endless journey. Tap and hold the screen to dive downward, then release to rise again. Master these simple controls to weave through incoming hazards and avoid deadly collisions.",
+    "Massive asteroid formations can block your path, while smaller asteroids appear unexpectedly from different directions. Every collision costs you a life, and with only three lives available, every maneuver counts.",
+    "The longer you survive, the more intense the cosmic chaos becomes. Stay focused, react quickly, and push your limits to see how long you can survive in the infinite void.",
+  ],
+  features: [
+    {
+      icon: "\u{1F30C}",
+      title: "Endless Cosmic Journey",
+      description: "Fly through an endless cosmic field filled with ever-changing hazards.",
+    },
+    {
+      icon: "\u2604\uFE0F",
+      title: "Deadly Asteroid Fields",
+      description: "Navigate around massive asteroid formations and unpredictable space debris.",
+    },
+    {
+      icon: "\u{1F4AB}",
+      title: "Simple Tap Controls",
+      description: "Hold to dive and release to rise.",
+    },
+    {
+      icon: "\u2764\uFE0F",
+      title: "Three Lives",
+      description: "Make every move count and avoid collisions to stay alive.",
+    },
+    {
+      icon: "\u{1F3AE}",
+      title: "Fast-Paced Arcade Action",
+      description: "Master easy-to-learn controls in a challenging survival experience.",
+    },
+    {
+      icon: "\u{1F3C6}",
+      title: "Endless Survival Challenge",
+      description: "Survive as long as possible, beat your personal best, and test your reflexes against the cosmic chaos.",
+    },
+  ],
+  genre: "Arcade",
+  secondaryGenres: [
+    "Action",
+    "Casual",
+    "Endless Runner",
+    "Survival",
+    "Space",
+  ],
+  platforms: ["Android"],
+  availability: "Coming soon",
+  icon: Gamepad2,
+  gradient: "from-[#3B4895] to-[#DE8A61]",
+
   },
   {
     number: "02",
