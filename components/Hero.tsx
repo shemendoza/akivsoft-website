@@ -485,7 +485,7 @@ export default function Hero() {
                 />
               </div>
 
-              <h1 className="m-0 max-w-[760px] font-ethnocentric text-[clamp(3rem,7vw,6rem)] font-normal leading-[0.98] tracking-[-0.025em]">
+              <h1 className="m-0 max-w-[760px] font-ethnocentric text-[clamp(1.75rem,10vw,3rem)] font-normal leading-[0.98] tracking-[-0.025em] sm:text-[clamp(3rem,7vw,6rem)]">
                 <span className="block text-white">Ideas made</span>
                 <span
                   className="gradient-text block w-fit pr-[0.12em]"
@@ -674,6 +674,8 @@ Develop
 
       <div
         className="
+          hidden
+          min-[1200px]:block
           absolute
           bottom-24
           left-1/2
