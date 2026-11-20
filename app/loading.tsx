@@ -1,4 +1,4 @@
-﻿export default function AdminLoading() {
+export default function Loading() {
   return (
     <main className="artsy-background relative flex min-h-screen items-center justify-center overflow-hidden px-5">
       <div className="pointer-events-none absolute inset-0">
@@ -23,10 +23,6 @@
           AKIVSOFT
         </h1>
 
-        <p className="mt-3 text-sm tracking-[0.15em] text-[#C5BFD0]">
-          Administration
-        </p>
-
         <div className="mt-8 flex items-center gap-2">
           <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#F0CA77]" />
           <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#DE8A61] [animation-delay:150ms]" />
@@ -34,7 +30,7 @@
         </div>
 
         <p className="mt-4 text-xs text-[#C5BFD0]/70">
-          Loading your workspace...
+          Loading
         </p>
       </div>
     </main>
