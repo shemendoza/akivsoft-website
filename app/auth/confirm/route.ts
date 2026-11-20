@@ -12,11 +12,11 @@ export async function GET(request: NextRequest) {
   const next =
     requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
       ? requestedNext
-      : "/admin/reset-password";
+      : "/akiv-base/admin/reset-password";
 
   if (!code) {
     return NextResponse.redirect(
-      new URL("/admin/login?error=recovery-failed", origin)
+      new URL("/akiv-base/admin/login?error=recovery-failed", origin)
     );
   }
 
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     console.error("Authentication confirmation failed:", error.message);
 
     return NextResponse.redirect(
-      new URL("/admin/login?error=recovery-failed", origin)
+      new URL("/akiv-base/admin/login?error=recovery-failed", origin)
     );
   }
 

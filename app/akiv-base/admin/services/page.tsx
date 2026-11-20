@@ -64,7 +64,7 @@ export default async function AdminServicesPage({
       <div className="relative mx-auto max-w-7xl">
         <div className="mb-8">
           <Link
-            href="/admin"
+            href="/akiv-base/admin"
             className="inline-flex items-center gap-2 text-sm text-[#C5BFD0] transition hover:text-[#F0CA77]"
           >
             ← Back to Dashboard

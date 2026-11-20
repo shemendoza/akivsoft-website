@@ -13,11 +13,11 @@ function getText(formData: FormData, name: string) {
 }
 
 function redirectWithError(message: string): never {
-  redirect(`/admin/portfolio?error=${encodeURIComponent(message)}`);
+  redirect(`/akiv-base/admin/portfolio?error=${encodeURIComponent(message)}`);
 }
 
 function revalidatePortfolio() {
-  revalidatePath("/admin/portfolio");
+  revalidatePath("/akiv-base/admin/portfolio");
   revalidatePath("/");
 }
 
@@ -151,7 +151,7 @@ export async function createPortfolioProject(formData: FormData) {
   }
 
   revalidatePortfolio();
-  redirect("/admin/portfolio?created=1");
+  redirect("/akiv-base/admin/portfolio?created=1");
 }
 
 export async function createPortfolioCategory(formData: FormData) {
@@ -193,7 +193,7 @@ export async function createPortfolioCategory(formData: FormData) {
   }
 
   revalidatePortfolio();
-  redirect("/admin/portfolio?categoryCreated=1");
+  redirect("/akiv-base/admin/portfolio?categoryCreated=1");
 }
 
 export async function updatePortfolioCategory(formData: FormData) {
@@ -244,7 +244,7 @@ export async function updatePortfolioCategory(formData: FormData) {
   }
 
   revalidatePortfolio();
-  redirect("/admin/portfolio?categoryUpdated=1");
+  redirect("/akiv-base/admin/portfolio?categoryUpdated=1");
 }
 
 export async function togglePortfolioCategoryPublished(formData: FormData) {
@@ -278,7 +278,7 @@ export async function togglePortfolioCategoryPublished(formData: FormData) {
   }
 
   revalidatePortfolio();
-  redirect("/admin/portfolio?categoryPublished=1");
+  redirect("/akiv-base/admin/portfolio?categoryPublished=1");
 }
 
 export async function deletePortfolioCategory(formData: FormData) {
@@ -318,7 +318,7 @@ export async function deletePortfolioCategory(formData: FormData) {
   }
 
   revalidatePortfolio();
-  redirect("/admin/portfolio?categoryDeleted=1");
+  redirect("/akiv-base/admin/portfolio?categoryDeleted=1");
 }
 
 export async function updatePortfolioProject(formData: FormData) {
@@ -478,7 +478,7 @@ export async function updatePortfolioProject(formData: FormData) {
   }
 
   revalidatePortfolio();
-  redirect("/admin/portfolio?projectUpdated=1");
+  redirect("/akiv-base/admin/portfolio?projectUpdated=1");
 }
 
 export async function togglePortfolioProjectPublished(formData: FormData) {
@@ -510,7 +510,7 @@ export async function togglePortfolioProjectPublished(formData: FormData) {
   }
 
   revalidatePortfolio();
-  redirect("/admin/portfolio?projectPublished=1");
+  redirect("/akiv-base/admin/portfolio?projectPublished=1");
 }
 
 export async function deletePortfolioProject(formData: FormData) {
@@ -565,5 +565,5 @@ export async function deletePortfolioProject(formData: FormData) {
   }
 
   revalidatePortfolio();
-  redirect("/admin/portfolio?projectDeleted=1");
+  redirect("/akiv-base/admin/portfolio?projectDeleted=1");
 }

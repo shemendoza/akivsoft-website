@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase";
 
-const ADMIN_PATH = "/admin/services";
+const ADMIN_PATH = "/akiv-base/admin/services";
 
 type ServiceContentBlockType = "list" | "feature";
 type ServiceContentBlockPosition = "left" | "right";

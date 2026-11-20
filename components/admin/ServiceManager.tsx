@@ -2,6 +2,8 @@
 "use client";
 
 import { useState } from "react";
+import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
+import type { ServiceContentBlockRecord } from "@/lib/admin-services";
 import {
   DndContext,
   KeyboardSensor,
@@ -85,10 +87,7 @@ import {
   toggleServicePublished,
   deleteService,
   reorderServices,
-} from "@/app/admin/services/actions";
-
-import ServiceContentBlockManager from "@/components/admin/ServiceContentBlockManager";
-import type { ServiceContentBlockRecord } from "@/lib/admin-services";
+} from "@/app/akiv-base/admin/services/actions";
 
 type ServiceSectionRecord = {
   id: string;
@@ -328,13 +327,16 @@ function SortableService({
 
           <form action={toggleServicePublished}>
             <input type="hidden" name="id" value={service.id} />
-            <button
-              type="submit"
+
+            <PendingSubmitButton
+              pendingText={
+                service.is_published ? "Unpublishing..." : "Publishing..."
+              }
               disabled={disabled}
               className="rounded-lg border border-white/15 px-3 py-2 text-xs text-[#C5BFD0] transition hover:border-[#F0CA77] hover:text-[#F0CA77] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {service.is_published ? "Unpublish" : "Publish"}
-            </button>
+            </PendingSubmitButton>
           </form>
 
           <form
@@ -346,13 +348,14 @@ function SortableService({
             }}
           >
             <input type="hidden" name="id" value={service.id} />
-            <button
-              type="submit"
+
+            <PendingSubmitButton
+              pendingText="Deleting..."
               disabled={disabled}
               className="rounded-lg border border-red-400/20 px-3 py-2 text-xs text-red-300 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Delete
-            </button>
+            </PendingSubmitButton>
           </form>
         </div>
       </div>
@@ -362,18 +365,12 @@ function SortableService({
 
 function SortableSection({
   section,
-  contentBlock,
   children,
   disabled,
-  expanded,
-  onToggle,
 }: {
   section: ServiceSectionRecord;
-  contentBlock: ServiceContentBlockRecord | null;
   children: React.ReactNode;
   disabled: boolean;
-  expanded: boolean;
-  onToggle: () => void;
 }) {
   const {
     attributes,
@@ -414,21 +411,6 @@ function SortableSection({
 
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={onToggle}
-                aria-expanded={expanded}
-                aria-label={`${expanded ? "Collapse" : "Expand"} ${section.title}`}
-                className="inline-flex shrink-0 items-center justify-center rounded-md p-1 text-[#C5BFD0]/60 transition hover:bg-white/5 hover:text-[#F0CA77]"
-              >
-                <ChevronDown
-                  size={19}
-                  className={`transition-transform duration-200 ${
-                    expanded ? "" : "-rotate-90"
-                  }`}
-                />
-              </button>
-
               <h3 className="min-w-0 break-words [overflow-wrap:anywhere] font-ethnocentric text-sm text-[#FFFDF8]">
                 {section.title}
               </h3>
@@ -455,19 +437,7 @@ function SortableSection({
         </div>
       </div>
 
-      {expanded && (
-        <>
-          <div className="mt-5 min-w-0 w-full max-w-full">{children}</div>
-
-          <div className="mt-5 border-t border-white/10 pt-5">
-            <ServiceContentBlockManager
-              sectionId={section.id}
-              sectionName={section.title}
-              block={contentBlock}
-            />
-          </div>
-        </>
-      )}
+      <div className="mt-5 min-w-0 w-full max-w-full">{children}</div>
     </article>
   );
 }
@@ -479,10 +449,6 @@ export default function ServiceManager({
 }: ServiceManagerProps) {
   const [sections, setSections] = useState(initialSections);
   const [services, setServices] = useState(initialServices);
-
-  const [expandedSectionIds, setExpandedSectionIds] = useState<Set<string>>(
-    () => new Set(initialSections.map((section) => section.id))
-  );
 
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
@@ -512,24 +478,6 @@ export default function ServiceManager({
     ICON_OPTIONS.find((item) => item.value === "Sparkles")!;
 
   const SelectedIcon = selectedIconOption.icon;
-
-  const unassignedContentBlocks = contentBlocks.filter(
-    (block) => !block.service_section_id
-  );
-
-  function toggleSection(sectionId: string) {
-    setExpandedSectionIds((current) => {
-      const next = new Set(current);
-
-      if (next.has(sectionId)) {
-        next.delete(sectionId);
-      } else {
-        next.add(sectionId);
-      }
-
-      return next;
-    });
-  }
 
   function cancelSectionForm() {
     setIsAddingSection(false);
@@ -673,6 +621,20 @@ export default function ServiceManager({
             Manage your website service sections and individual services.
             Drag items to change their display order.
           </p>
+
+          {isReordering && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="mt-3 inline-flex items-center gap-2 text-xs font-medium text-[#F0CA77]"
+            >
+              <span
+                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent"
+                aria-hidden="true"
+              />
+              Saving order...
+            </div>
+          )}
         </div>
 
         {!isAddingSection && !editingSectionId && (
@@ -687,37 +649,6 @@ export default function ServiceManager({
           </button>
         )}
       </div>
-
-      {unassignedContentBlocks.length > 0 && (
-        <div className="mt-6 rounded-xl border border-[#DE8A61]/30 bg-[#DE8A61]/10 p-4">
-          <h3 className="text-sm font-semibold text-[#F0CA77]">
-            Unassigned Content Blocks
-          </h3>
-
-          <p className="mt-2 text-xs leading-relaxed text-[#C5BFD0]">
-            The following content blocks are not assigned to a service
-            section. They are still saved in the database and have not been
-            deleted. Assign them to their intended sections before managing
-            them through the section content-block managers.
-          </p>
-
-          <ul className="mt-3 space-y-2">
-            {unassignedContentBlocks.map((block) => (
-              <li
-                key={block.id}
-                className="flex flex-wrap items-center gap-2 text-xs text-[#FFFDF8]"
-              >
-                <span className="rounded-full border border-[#DE8A61]/30 px-2 py-1 text-[10px] uppercase tracking-wider text-[#DE8A61]">
-                  {block.block_type}
-                </span>
-                <span className="break-words">
-                  {block.heading || "Untitled content block"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {(isAddingSection || editingSectionId) && (
         <form
@@ -771,12 +702,12 @@ export default function ServiceManager({
           </label>
 
           <div className="flex min-w-0 flex-wrap gap-3">
-            <button
-              type="submit"
-              className="rounded-lg bg-[#DE8A61] px-5 py-3 text-sm font-semibold text-[#15162D] transition hover:bg-[#F0CA77]"
+            <PendingSubmitButton
+              pendingText={isAddingSection ? "Creating..." : "Saving..."}
+              className="rounded-lg bg-[#DE8A61] px-5 py-3 text-sm font-semibold text-[#15162D] transition hover:bg-[#F0CA77] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isAddingSection ? "Create Section" : "Save Changes"}
-            </button>
+            </PendingSubmitButton>
 
             <button
               type="button"
@@ -811,11 +742,6 @@ export default function ServiceManager({
                     .filter((service) => service.section_id === section.id)
                     .sort((a, b) => a.display_order - b.display_order);
 
-                  const sectionContentBlock =
-                    contentBlocks.find(
-                      (block) => block.service_section_id === section.id
-                    ) ?? null;
-
                   const formIsOpen =
                     isAddingSection ||
                     Boolean(editingSectionId) ||
@@ -825,10 +751,7 @@ export default function ServiceManager({
                     <SortableSection
                       key={section.id}
                       section={section}
-                      contentBlock={sectionContentBlock}
                       disabled={isReordering || formIsOpen}
-                      expanded={expandedSectionIds.has(section.id)}
-                      onToggle={() => toggleSection(section.id)}
                     >
                       <div className="flex min-w-0 w-full flex-wrap items-center gap-2">
                         <button
@@ -842,13 +765,18 @@ export default function ServiceManager({
 
                         <form action={toggleServiceSectionPublished}>
                           <input type="hidden" name="id" value={section.id} />
-                          <button
-                            type="submit"
+
+                          <PendingSubmitButton
+                            pendingText={
+                              section.is_published
+                                ? "Unpublishing..."
+                                : "Publishing..."
+                            }
                             disabled={formIsOpen || isReordering}
                             className="rounded-lg border border-white/15 px-3 py-2 text-xs text-[#C5BFD0] transition hover:border-[#F0CA77] hover:text-[#F0CA77] disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             {section.is_published ? "Unpublish" : "Publish"}
-                          </button>
+                          </PendingSubmitButton>
                         </form>
 
                         <form
@@ -864,23 +792,27 @@ export default function ServiceManager({
                           }}
                         >
                           <input type="hidden" name="id" value={section.id} />
-                          <button
-                            type="submit"
-                            disabled={
-                              sectionServices.length > 0 ||
-                              formIsOpen ||
-                              isReordering
-                            }
+
+                          <span
                             title={
                               sectionServices.length > 0
                                 ? "Move or delete this section's services first."
                                 : "Delete section"
                             }
-                            className="inline-flex items-center gap-1 rounded-lg border border-red-400/20 px-3 py-2 text-xs text-red-300 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-40"
                           >
-                            <Trash2 size={13} />
-                            Delete
-                          </button>
+                            <PendingSubmitButton
+                              pendingText="Deleting..."
+                              disabled={
+                                sectionServices.length > 0 ||
+                                formIsOpen ||
+                                isReordering
+                              }
+                              className="inline-flex items-center gap-1 rounded-lg border border-red-400/20 px-3 py-2 text-xs text-red-300 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              <Trash2 size={13} />
+                              Delete
+                            </PendingSubmitButton>
+                          </span>
                         </form>
                       </div>
 
@@ -1163,12 +1095,12 @@ export default function ServiceManager({
           </div>
 
           <div className="flex min-w-0 flex-wrap gap-3 pt-2">
-            <button
-              type="submit"
-              className="rounded-lg bg-[#DE8A61] px-5 py-3 text-sm font-semibold text-[#15162D] transition hover:bg-[#F0CA77]"
+            <PendingSubmitButton
+              pendingText={editingServiceId ? "Saving..." : "Creating..."}
+              className="rounded-lg bg-[#DE8A61] px-5 py-3 text-sm font-semibold text-[#15162D] transition hover:bg-[#F0CA77] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {editingServiceId ? "Save Changes" : "Create Service"}
-            </button>
+            </PendingSubmitButton>
 
             <button
               type="button"

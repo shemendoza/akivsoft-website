@@ -8,7 +8,7 @@ import {
   updatePortfolioCategory,
   togglePortfolioCategoryPublished,
   deletePortfolioCategory,
-} from "@/app/admin/portfolio/actions";
+} from "@/app/akiv-base/admin/portfolio/actions";
 
 import type { PortfolioCategoryRecord } from "@/types/portfolio";
 

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     "Websites, unity games, applications, graphics, videos, and digital art built with code and creativity.",
   icons: {
-    icon: "images/a-logo.png",
+    icon: "/images/a-logo.png",
   },
 };
 

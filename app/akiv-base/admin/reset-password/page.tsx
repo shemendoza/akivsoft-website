@@ -12,11 +12,11 @@ async function updatePassword(formData: FormData) {
   );
 
   if (password.length < 8) {
-    redirect("/admin/reset-password?error=weak-password");
+    redirect("/akiv-base/admin/reset-password?error=weak-password");
   }
 
   if (password !== confirmPassword) {
-    redirect("/admin/reset-password?error=password-mismatch");
+    redirect("/akiv-base/admin/reset-password?error=password-mismatch");
   }
 
   const supabase = await createClient();
@@ -27,7 +27,7 @@ async function updatePassword(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    redirect("/admin/login?error=recovery-failed");
+    redirect("/akiv-base/admin/login?error=recovery-failed");
   }
 
   const { data: admin, error: adminError } = await supabase
@@ -38,7 +38,7 @@ async function updatePassword(formData: FormData) {
 
   if (adminError || !admin) {
     await supabase.auth.signOut();
-    redirect("/admin/login?error=unauthorized");
+    redirect("/akiv-base/admin/login?error=unauthorized");
   }
 
   const { error } = await supabase.auth.updateUser({
@@ -47,10 +47,10 @@ async function updatePassword(formData: FormData) {
 
   if (error) {
     console.error("Password update failed:", error.message);
-    redirect("/admin/reset-password?error=update-failed");
+    redirect("/akiv-base/admin/reset-password?error=update-failed");
   }
 
-  redirect("/admin/reset-password?success=updated");
+  redirect("/akiv-base/admin/reset-password?success=updated");
 }
 
 type ResetPasswordPageProps = {
@@ -113,7 +113,7 @@ export default async function ResetPasswordPage({
               </div>
 
               <a
-                href="/admin/login"
+                href="/akiv-base/admin/login"
                 className="mt-6 block w-full rounded-lg bg-[#DE8A61] px-5 py-3.5 text-center font-semibold text-[#15162D] transition hover:bg-[#F0CA77]"
               >
                 Go to Admin Login

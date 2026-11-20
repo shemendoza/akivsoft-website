@@ -3,38 +3,57 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
 import { createClient } from "@/lib/supabase";
+import { isAdministratorEmail } from "@/lib/supabase-admin";
 
 async function requestPasswordReset(formData: FormData) {
   "use server";
 
-  const email = String(formData.get("email") ?? "").trim();
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
 
   if (!email) {
-    redirect("/admin/forgot-password?error=missing-email");
+    redirect("/akiv-base/admin/forgot-password?error=missing-email");
   }
 
   const headerStore = await headers();
-  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  const host =
+    headerStore.get("x-forwarded-host") ?? headerStore.get("host");
   const protocol = headerStore.get("x-forwarded-proto") ?? "https";
 
   if (!host) {
-    redirect("/admin/forgot-password?error=server");
+    redirect("/akiv-base/admin/forgot-password?error=server");
   }
 
   const origin = `${protocol}://${host}`;
 
-  const supabase = await createClient();
+  // Only administrator accounts may request password recovery.
+  const isAdmin = await isAdministratorEmail(email);
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/confirm?next=/admin/reset-password`,
-  });
-
-  if (error) {
-    console.error("Password recovery request failed:", error.message);
-    redirect("/admin/forgot-password?error=request-failed");
+  // Use the same response for authorized and unauthorized emails
+  // to avoid revealing which email addresses are administrators.
+  if (!isAdmin) {
+    redirect("/akiv-base/admin/forgot-password?success=sent");
   }
 
-  redirect("/admin/forgot-password?success=sent");
+  const supabase = await createClient();
+const redirectTo =
+  `${origin}/auth/confirm?next=/akiv-base/admin/reset-password`;
+
+const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  redirectTo,
+});
+
+  if (error) {
+    console.error(
+      "Password recovery request failed:",
+      error.message
+    );
+
+    redirect("/akiv-base/admin/forgot-password?error=request-failed");
+  }
+
+  redirect("/akiv-base/admin/forgot-password?success=sent");
 }
 
 type ForgotPasswordPageProps = {
@@ -130,7 +149,7 @@ export default async function ForgotPasswordPage({
           </form>
 
           <a
-            href="/admin/login"
+            href="/akiv-base/admin/login"
             className="mt-6 block text-center text-sm text-[#C5BFD0] transition hover:text-[#F0CA77]"
           >
             Back to Admin Login

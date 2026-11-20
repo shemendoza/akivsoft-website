@@ -12,7 +12,7 @@ async function logout() {
 
   await supabase.auth.signOut();
 
-  redirect("/admin/login");
+  redirect("/akiv-base/admin/login");
 }
 
 export default async function AdminDashboardPage() {
@@ -87,7 +87,7 @@ export default async function AdminDashboardPage() {
 
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             <Link
-              href="/admin/portfolio"
+              href="/akiv-base/admin/portfolio"
               className="group rounded-2xl border border-white/10 bg-[#15162D]/80 p-6 backdrop-blur-xl transition hover:border-[#F0CA77]/50 hover:bg-[#1B1A35]"
             >
               <h2 className="font-ethnocentric text-base text-[#FFFDF8] transition group-hover:text-[#F0CA77]">
@@ -104,7 +104,7 @@ export default async function AdminDashboardPage() {
             </Link>
 
             <Link
-              href="/admin/services"
+              href="/akiv-base/admin/services"
               className="group rounded-2xl border border-white/10 bg-[#15162D]/80 p-6 backdrop-blur-xl transition hover:border-[#F0CA77]/50 hover:bg-[#1B1A35]"
             >
               <h2 className="font-ethnocentric text-base text-[#FFFDF8] transition group-hover:text-[#F0CA77]">

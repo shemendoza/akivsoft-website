@@ -1,69 +1,70 @@
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase";
+import {
+  AKIV_BASE_COOKIE_NAME,
+  AKIV_BASE_SESSION_DURATION,
+  createAccessToken,
+  verifyAccessPassword,
+} from "@/lib/akiv-base-access";
 
-type LoginPageProps = {
+type AccessPageProps = {
   searchParams: Promise<{
     error?: string;
   }>;
 };
 
-async function login(formData: FormData) {
+async function unlockWorkspace(formData: FormData) {
   "use server";
 
-  const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
-  if (!email || !password) {
-    redirect("/admin/login?error=missing-fields");
+  const isValid = await verifyAccessPassword(password);
+
+  if (!isValid) {
+    const configured =
+      Boolean(process.env.AKIV_BASE_PASSWORD) &&
+      Boolean(process.env.AKIV_BASE_SESSION_SECRET) &&
+      process.env.AKIV_BASE_SESSION_SECRET!.length >= 32;
+
+    redirect(
+      configured
+        ? "/akiv-base/access?error=invalid-password"
+        : "/akiv-base/access?error=configuration"
+    );
   }
 
-  const supabase = await createClient();
+  const token = await createAccessToken();
 
-  const { error: loginError } =
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-  if (loginError) {
-    redirect("/admin/login?error=invalid-credentials");
+  if (!token) {
+    redirect("/akiv-base/access?error=configuration");
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const cookieStore = await cookies();
 
-  if (!user) {
-    await supabase.auth.signOut();
-    redirect("/admin/login?error=unauthorized");
-  }
+  cookieStore.set({
+    name: AKIV_BASE_COOKIE_NAME,
+    value: token,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/akiv-base",
+    maxAge: AKIV_BASE_SESSION_DURATION,
+  });
 
-  const { data: admin, error: adminError } = await supabase
-    .from("admin_users")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-
-  if (adminError || !admin) {
-    await supabase.auth.signOut();
-    redirect("/admin/login?error=unauthorized");
-  }
-
-  redirect("/admin");
+  redirect("/akiv-base/admin/login");
 }
 
-export default async function AdminLoginPage({
+export default async function AkivBaseAccessPage({
   searchParams,
-}: LoginPageProps) {
+}: AccessPageProps) {
   const { error } = await searchParams;
 
   const errorMessages: Record<string, string> = {
-    "missing-fields": "Please enter your email and password.",
-    "invalid-credentials": "Invalid email or password.",
-    unauthorized: "You do not have administrator access.",
+    "invalid-password": "The workspace password is incorrect.",
+    configuration:
+      "Workspace access is not configured correctly. Please contact the administrator.",
   };
 
   return (
@@ -89,11 +90,12 @@ export default async function AdminLoginPage({
           </p>
 
           <h1 className="mt-4 font-ethnocentric text-2xl text-[#FFFDF8]">
-            Admin Login
+            Private Access
           </h1>
 
           <p className="mt-3 text-sm leading-relaxed text-[#C5BFD0]">
-            Sign in to manage your portfolio and website content.
+            Enter the workspace password to continue to the
+            administration area.
           </p>
         </div>
 
@@ -107,32 +109,13 @@ export default async function AdminLoginPage({
             </div>
           )}
 
-          <form action={login} className="space-y-5">
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-medium text-[#FFFDF8]"
-              >
-                Email Address
-              </label>
-
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="username"
-                required
-                className="w-full rounded-lg border border-white/15 bg-[#0D1023] px-4 py-3 text-sm text-[#FFFDF8] outline-none transition placeholder:text-[#C5BFD0]/50 focus:border-[#F0CA77]"
-                placeholder="Enter your admin email"
-              />
-            </div>
-
+          <form action={unlockWorkspace} className="space-y-5">
             <div>
               <label
                 htmlFor="password"
                 className="mb-2 block text-sm font-medium text-[#FFFDF8]"
               >
-                Password
+                Workspace Password
               </label>
 
               <input
@@ -142,7 +125,7 @@ export default async function AdminLoginPage({
                 autoComplete="current-password"
                 required
                 className="w-full rounded-lg border border-white/15 bg-[#0D1023] px-4 py-3 text-sm text-[#FFFDF8] outline-none transition placeholder:text-[#C5BFD0]/50 focus:border-[#F0CA77]"
-                placeholder="Enter your password"
+                placeholder="Enter your workspace password"
               />
             </div>
 
@@ -150,21 +133,13 @@ export default async function AdminLoginPage({
               type="submit"
               className="w-full rounded-lg bg-[#DE8A61] px-5 py-3.5 font-semibold text-[#15162D] transition hover:bg-[#F0CA77] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0CA77]"
             >
-              Sign In
+              Unlock Workspace
             </button>
-            <div className="flex justify-center">
-  <a
-    href="/admin/forgot-password"
-    className="text-sm text-[#C5BFD0] transition hover:text-[#F0CA77]"
-  >
-    Forgot Password?
-  </a>
-</div>
           </form>
         </div>
 
         <p className="mt-7 text-center text-xs text-[#C5BFD0]/60">
-          Authorized administrators only.
+          Restricted workspace · Authorized access only
         </p>
       </div>
     </main>

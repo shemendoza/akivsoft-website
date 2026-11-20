@@ -2,13 +2,14 @@
 "use client";
 
 import { useState } from "react";
+import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
 
 import {
   createServiceContentBlock,
   updateServiceContentBlock,
   toggleServiceContentBlockPublished,
   deleteServiceContentBlock,
-} from "@/app/admin/services/actions";
+} from "@/app/akiv-base/admin/services/actions";
 
 import type {
   ServiceContentBlockItem,
@@ -493,8 +494,8 @@ export default function ServiceContentBlockManager({
         </div>
 
         <div className="flex flex-wrap gap-3 border-t border-white/10 pt-4">
-          <button
-            type="submit"
+          <PendingSubmitButton
+            pendingText={isNew ? "Creating..." : "Saving..."}
             disabled={
               !heading.trim() ||
               (blockType === "list"
@@ -504,7 +505,7 @@ export default function ServiceContentBlockManager({
             className="rounded-lg bg-gradient-to-r from-[#934C60] to-[#DE8A61] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isNew ? "Create Content Block" : "Save Changes"}
-          </button>
+          </PendingSubmitButton>
 
           <button
             type="button"
@@ -595,12 +596,14 @@ export default function ServiceContentBlockManager({
               <form action={toggleServiceContentBlockPublished}>
                 <input type="hidden" name="id" value={block.id} />
 
-                <button
-                  type="submit"
+                <PendingSubmitButton
+                  pendingText={
+                    block.is_published ? "Unpublishing..." : "Publishing..."
+                  }
                   className="rounded-lg border border-white/10 px-3 py-2 text-xs text-[#C5BFD0] transition hover:border-[#F0CA77]/40 hover:text-[#F0CA77]"
                 >
                   {block.is_published ? "Unpublish" : "Publish"}
-                </button>
+                </PendingSubmitButton>
               </form>
 
               <button
@@ -625,12 +628,12 @@ export default function ServiceContentBlockManager({
               >
                 <input type="hidden" name="id" value={block.id} />
 
-                <button
-                  type="submit"
+                <PendingSubmitButton
+                  pendingText="Deleting..."
                   className="rounded-lg border border-red-400/20 px-3 py-2 text-xs text-red-300 transition hover:bg-red-400/10"
                 >
                   Delete
-                </button>
+                </PendingSubmitButton>
               </form>
             </div>
           </div>

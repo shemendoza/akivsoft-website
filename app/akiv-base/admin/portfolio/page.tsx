@@ -56,7 +56,7 @@ export default async function AdminPortfolioPage({
         <header className="flex flex-col justify-between gap-5 border-b border-white/10 pb-8 sm:flex-row sm:items-center">
           <div>
             <Link
-              href="/admin"
+              href="/akiv-base/admin"
               className="text-sm text-[#C5BFD0] transition hover:text-[#F0CA77]"
             >
               ← Back to Dashboard
@@ -72,7 +72,7 @@ export default async function AdminPortfolioPage({
           </div>
 
           <Link
-            href="/admin"
+            href="/akiv-base/admin"
             className="inline-flex items-center justify-center rounded-lg border border-white/15 px-5 py-3 text-sm text-[#FFFDF8] transition hover:border-[#F0CA77] hover:text-[#F0CA77]"
           >
             Dashboard
