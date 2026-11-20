@@ -1,6 +1,6 @@
-
 import { redirect } from "next/navigation";
 
+import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
 import { createClient } from "@/lib/supabase";
 
 type LoginPageProps = {
@@ -45,7 +45,6 @@ async function login(formData: FormData) {
     .select("user_id")
     .eq("user_id", user.id)
     .maybeSingle();
-
 
   if (adminError || !admin) {
     await supabase.auth.signOut();
@@ -146,20 +145,21 @@ export default async function AdminLoginPage({
               />
             </div>
 
-            <button
-              type="submit"
+            <PendingSubmitButton
+              pendingText="Signing in..."
               className="w-full rounded-lg bg-[#DE8A61] px-5 py-3.5 font-semibold text-[#15162D] transition hover:bg-[#F0CA77] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0CA77]"
             >
               Sign In
-            </button>
+            </PendingSubmitButton>
+
             <div className="flex justify-center">
-  <a
-    href="/akiv-base/admin/forgot-password"
-    className="text-sm text-[#C5BFD0] transition hover:text-[#F0CA77]"
-  >
-    Forgot Password?
-  </a>
-</div>
+              <a
+                href="/akiv-base/admin/forgot-password"
+                className="text-sm text-[#C5BFD0] transition hover:text-[#F0CA77]"
+              >
+                Forgot Password?
+              </a>
+            </div>
           </form>
         </div>
 

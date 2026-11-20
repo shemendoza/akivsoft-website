@@ -1,9 +1,12 @@
-
 "use client";
 
 import { useState } from "react";
+
+import ServiceContentBlockManager from "@/components/admin/ServiceContentBlockManager";
 import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
+
 import type { ServiceContentBlockRecord } from "@/lib/admin-services";
+
 import {
   DndContext,
   KeyboardSensor,
@@ -13,6 +16,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
+
 import {
   SortableContext,
   arrayMove,
@@ -20,7 +24,9 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+
 import { CSS } from "@dnd-kit/utilities";
+
 import {
   Activity,
   Blocks,
@@ -74,6 +80,7 @@ import {
   Check,
   ChevronDown,
 } from "lucide-react";
+
 import type { LucideIcon } from "lucide-react";
 
 import {
@@ -742,6 +749,12 @@ export default function ServiceManager({
                     .filter((service) => service.section_id === section.id)
                     .sort((a, b) => a.display_order - b.display_order);
 
+                  // Retrieve the optional content block belonging to this section.
+                  const sectionContentBlock =
+                    contentBlocks.find(
+                      (block) => block.service_section_id === section.id
+                    ) ?? null;
+
                   const formIsOpen =
                     isAddingSection ||
                     Boolean(editingSectionId) ||
@@ -816,6 +829,7 @@ export default function ServiceManager({
                         </form>
                       </div>
 
+                      {/* Individual services belonging to this section */}
                       <div className="mt-5 min-w-0 w-full max-w-full border-t border-white/10 pt-5">
                         <div className="flex min-w-0 flex-col justify-between gap-3 sm:flex-row sm:items-center">
                           <div className="min-w-0">
@@ -878,6 +892,18 @@ export default function ServiceManager({
                           </div>
                         )}
                       </div>
+                                          {/* Individual services belonging to this section */}
+                      <div className="mt-5 min-w-0 w-full max-w-full border-t border-white/10 pt-5">
+                        {/* Keep all existing Services heading,
+                            Add Service button, and service list here. */}
+                      </div>
+
+                      {/* Section-level content block management */}
+                      <ServiceContentBlockManager
+                        sectionId={section.id}
+                        sectionName={section.title}
+                        block={sectionContentBlock}
+                      />
                     </SortableSection>
                   );
                 })}

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -9,6 +8,8 @@ import {
   togglePortfolioCategoryPublished,
   deletePortfolioCategory,
 } from "@/app/akiv-base/admin/portfolio/actions";
+
+import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
 
 import type { PortfolioCategoryRecord } from "@/types/portfolio";
 
@@ -225,12 +226,12 @@ export default function PortfolioCategoryManager({
           </div>
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <button
-              type="submit"
+            <PendingSubmitButton
+              pendingText={isAdding ? "Creating..." : "Saving..."}
               className="rounded-lg bg-[#DE8A61] px-5 py-3 text-sm font-semibold text-[#15162D] transition hover:bg-[#F0CA77]"
             >
               {isAdding ? "Create Category" : "Save Changes"}
-            </button>
+            </PendingSubmitButton>
 
             <button
               type="button"
@@ -310,13 +311,17 @@ export default function PortfolioCategoryManager({
                         value={String(!category.is_published)}
                       />
 
-                      <button
-                        type="submit"
+                      <PendingSubmitButton
+                        pendingText={
+                          category.is_published
+                            ? "Unpublishing..."
+                            : "Publishing..."
+                        }
                         disabled={isAdding || Boolean(editingId)}
                         className="rounded-lg border border-white/15 px-3 py-2 text-xs text-[#C5BFD0] transition hover:border-[#F0CA77] hover:text-[#F0CA77] disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {category.is_published ? "Unpublish" : "Publish"}
-                      </button>
+                      </PendingSubmitButton>
                     </form>
 
                     <form action={deletePortfolioCategory}>
@@ -326,22 +331,25 @@ export default function PortfolioCategoryManager({
                         value={category.id}
                       />
 
-                      <button
-                        type="submit"
-                        disabled={
-                          projectCount > 0 ||
-                          isAdding ||
-                          Boolean(editingId)
-                        }
-                        className="rounded-lg border border-red-400/20 px-3 py-2 text-xs text-red-300 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-40"
+                      <span
                         title={
                           projectCount > 0
                             ? "Move or delete this category's projects first."
                             : "Delete category"
                         }
                       >
-                        Delete
-                      </button>
+                        <PendingSubmitButton
+                          pendingText="Deleting..."
+                          disabled={
+                            projectCount > 0 ||
+                            isAdding ||
+                            Boolean(editingId)
+                          }
+                          className="rounded-lg border border-red-400/20 px-3 py-2 text-xs text-red-300 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          Delete
+                        </PendingSubmitButton>
+                      </span>
                     </form>
                   </div>
                 </div>

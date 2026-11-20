@@ -1,7 +1,7 @@
-
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
+import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
 import { createClient } from "@/lib/supabase";
 import { isAdministratorEmail } from "@/lib/supabase-admin";
 
@@ -37,12 +37,12 @@ async function requestPasswordReset(formData: FormData) {
   }
 
   const supabase = await createClient();
-const redirectTo =
-  `${origin}/auth/confirm?next=/akiv-base/admin/reset-password`;
+  const redirectTo =
+    `${origin}/auth/confirm?next=/akiv-base/admin/reset-password`;
 
-const { error } = await supabase.auth.resetPasswordForEmail(email, {
-  redirectTo,
-});
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo,
+  });
 
   if (error) {
     console.error(
@@ -140,12 +140,12 @@ export default async function ForgotPasswordPage({
               />
             </div>
 
-            <button
-              type="submit"
+            <PendingSubmitButton
+              pendingText="Sending reset link..."
               className="w-full rounded-lg bg-[#DE8A61] px-5 py-3.5 font-semibold text-[#15162D] transition hover:bg-[#F0CA77] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0CA77]"
             >
               Send Recovery Link
-            </button>
+            </PendingSubmitButton>
           </form>
 
           <a

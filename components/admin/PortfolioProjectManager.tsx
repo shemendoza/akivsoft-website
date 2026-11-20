@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -8,6 +7,8 @@ import {
   togglePortfolioProjectPublished,
   deletePortfolioProject,
 } from "@/app/akiv-base/admin/portfolio/actions";
+
+import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
 
 import type {
   PortfolioCategoryRecord,
@@ -996,12 +997,12 @@ export default function PortfolioProjectManager({
           )}
 
           <div className="flex flex-wrap gap-3 border-t border-white/10 pt-5">
-            <button
-              type="submit"
+            <PendingSubmitButton
+              pendingText="Saving..."
               className="rounded-lg bg-[#DE8A61] px-5 py-3 text-sm font-semibold text-[#15162D] transition hover:bg-[#F0CA77]"
             >
               Save Project Changes
-            </button>
+            </PendingSubmitButton>
 
             <button
               type="button"
@@ -1109,12 +1110,16 @@ export default function PortfolioProjectManager({
                       value={String(!project.is_published)}
                     />
 
-                    <button
-                      type="submit"
+                    <PendingSubmitButton
+                      pendingText={
+                        project.is_published
+                          ? "Unpublishing..."
+                          : "Publishing..."
+                      }
                       className="rounded-lg border border-white/15 px-4 py-2 text-xs text-[#C5BFD0] transition hover:border-[#F0CA77] hover:text-[#F0CA77]"
                     >
                       {project.is_published ? "Unpublish" : "Publish"}
-                    </button>
+                    </PendingSubmitButton>
                   </form>
 
                   <form
@@ -1135,12 +1140,12 @@ export default function PortfolioProjectManager({
                       value={project.id}
                     />
 
-                    <button
-                      type="submit"
+                    <PendingSubmitButton
+                      pendingText="Deleting..."
                       className="rounded-lg border border-red-400/20 px-4 py-2 text-xs text-red-300 transition hover:bg-red-400/10"
                     >
                       Delete
-                    </button>
+                    </PendingSubmitButton>
                   </form>
                 </div>
               </article>

@@ -1,9 +1,9 @@
-
 "use client";
 
 import { useState } from "react";
 
 import { createPortfolioProject } from "@/app/akiv-base/admin/portfolio/actions";
+import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
 import type { PortfolioCategoryRecord } from "@/types/portfolio";
 
 type Feature = {
@@ -734,13 +734,13 @@ export default function PortfolioProjectForm({
           The project will initially be saved as an unpublished draft.
         </p>
 
-        <button
-          type="submit"
+        <PendingSubmitButton
+          pendingText="Creating..."
           disabled={categories.length === 0}
           className="rounded-xl bg-gradient-to-r from-[#3B4895] to-[#934C60] px-7 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Create Project
-        </button>
+        </PendingSubmitButton>
       </div>
 
       {categories.length === 0 && (
