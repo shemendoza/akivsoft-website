@@ -1,161 +1,11 @@
-"use client";
 
-import { Gamepad2, Globe, Smartphone } from "lucide-react";
-import PortfolioCarousel from "@/components/PortfolioCarousel";
-import type { PortfolioItem } from "@/types/portfolio";
+import { getPublishedPortfolio } from "@/lib/portfolio";
+import PortfolioSections from "@/components/PortfolioSections";
 
-const portfolioItems: PortfolioItem[] = [
-  {
+export default async function Portfolio() {
+  const { categories, projects, details } =
+    await getPublishedPortfolio();
 
-  number: "01",
-  detailsId: "cosmic-shunner-details",
-  closing: {
-    prompt: "Can you survive the infinite void?",
-    subline: "Enter the cosmos. Face the chaos. Dodge everything.",
-    brand: "Cosmic Shunner",
-    tagline: "Survive the infinite void by dodging everything it throws at you.",
-  },
-  title: "Cosmic Shunner",
-  image: "/unity-images/1.jpeg",
-  tagline: "Fly. Survive. Outlast.",
-  description: [
-    "Survive the infinite void by dodging everything it throws at you.",
-    "Take control of your astronaut and navigate through a dangerous cosmic field filled with massive asteroid formations and unpredictable space debris. Every moment tests your reflexes as you maneuver through deadly obstacles and fight to stay alive.",
-    "Your astronaut constantly flies upward on an endless journey. Tap and hold the screen to dive downward, then release to rise again. Master these simple controls to weave through incoming hazards and avoid deadly collisions.",
-    "Massive asteroid formations can block your path, while smaller asteroids appear unexpectedly from different directions. Every collision costs you a life, and with only three lives available, every maneuver counts.",
-    "The longer you survive, the more intense the cosmic chaos becomes. Stay focused, react quickly, and push your limits to see how long you can survive in the infinite void.",
-  ],
-  features: [
-    {
-      icon: "\u{1F30C}",
-      title: "Endless Cosmic Journey",
-      description: "Fly through an endless cosmic field filled with ever-changing hazards.",
-    },
-    {
-      icon: "\u2604\uFE0F",
-      title: "Deadly Asteroid Fields",
-      description: "Navigate around massive asteroid formations and unpredictable space debris.",
-    },
-    {
-      icon: "\u{1F4AB}",
-      title: "Simple Tap Controls",
-      description: "Hold to dive and release to rise.",
-    },
-    {
-      icon: "\u2764\uFE0F",
-      title: "Three Lives",
-      description: "Make every move count and avoid collisions to stay alive.",
-    },
-    {
-      icon: "\u{1F3AE}",
-      title: "Fast-Paced Arcade Action",
-      description: "Master easy-to-learn controls in a challenging survival experience.",
-    },
-    {
-      icon: "\u{1F3C6}",
-      title: "Endless Survival Challenge",
-      description: "Survive as long as possible, beat your personal best, and test your reflexes against the cosmic chaos.",
-    },
-  ],
-  genre: "Arcade",
-  secondaryGenres: [
-    "Action",
-    "Casual",
-    "Endless Runner",
-    "Survival",
-    "Space",
-  ],
-  platforms: ["Android"],
-  availability: "Coming soon",
-  icon: Gamepad2,
-  gradient: "from-[#3B4895] to-[#DE8A61]",
-
-  },
-  {
-    number: "02",
-    title: "",
-    tagline: "",
-    description: [],
-    features: [],
-    genre: "",
-    secondaryGenres: [],
-    availability: "Coming soon",
-    icon: Gamepad2,
-    gradient: "from-[#3B4895] to-[#DE8A61]",
-  },
-  {
-    number: "03",
-    title: "",
-    tagline: "",
-    description: [],
-    features: [],
-    genre: "",
-    secondaryGenres: [],
-    availability: "Coming soon",
-    icon: Gamepad2,
-    gradient: "from-[#3B4895] to-[#DE8A61]",
-  },
-];
-
-const otherServiceItems: PortfolioItem[] = [
-  {
-    number: "01",
-    kind: "App",
-    detailsId: "lifely-space-details",
-    category: "Application Development",
-    title: "Lifely Space",
-    image: "/images/a-logo.png",
-    tagline: "Your space for everything life.",
-    description: [
-      "Lifely Space is a customizable digital journaling app designed to give you one flexible space for writing, planning, organizing, creating, and keeping track of everyday life.",
-    ],
-    features: [
-      { icon: "📝", title: "Your Personal Life Space", description: "Keep your notes, plans, journals, and ideas all in one place." },
-      { icon: "✍️", title: "Rich Text Editing", description: "Customize selected text with fonts, colors, sizes, bold, italic, underline, and highlights." },
-      { icon: "🖼️", title: "Write Anywhere", description: "Add text freely around images, tables, shapes, checklists, and other content." },
-      { icon: "🎨", title: "Creative Tools", description: "Draw, sketch, add shapes, dividers, and personalize your pages." },
-      { icon: "🗂️", title: "Organize Your Life", description: "Create folders and notebooks for everything from Life Admin and Brain Dumps to goals and projects." },
-      { icon: "📅", title: "Built-In Calendar", description: "Plan, organize, and keep track of important dates." },
-      { icon: "↔️", title: "Flexible Pages", description: "Move, resize, rotate, and arrange content anywhere on your page." },
-      { icon: "✨", title: "Templates & Customization", description: "Start with templates or create pages that fit your style." },
-      { icon: "↩️", title: "Stay in Control", description: "Undo, redo, autosave, backup, and restore your journal content." },
-      { icon: "📄", title: "Export Your Pages", description: "Turn your journals into PDF files whenever you need them." },
-      { icon: "📴", title: "Offline by Design", description: "Write, plan, and organize your life without needing an internet connection." },
-    ],
-    genre: "",
-    secondaryGenres: [],
-    platforms: ["Android"],
-    builtWith: ["Kotlin", "Android SDK", "Jetpack Compose", "Material 3", "AndroidX", "Gradle"],
-    availability: "Coming Soon",
-    icon: Smartphone,
-    gradient: "from-[#3B4895] to-[#DE8A61]",
-    closing: {
-      prompt: "Where will you make space for your life?",
-      subline: "Write it down. Plan it out. Make it yours.",
-      brand: "Lifely Space",
-      tagline: "Your life. Your space. Your way.",
-    },
-  },
-  {
-    number: "02",
-    kind: "Web",
-    detailsId: "website-development-details",
-    category: "Web Development",
-    title: "Website Development",
-    tagline: "",
-    description: [
-      "Explore our upcoming web development work, featuring modern, responsive, and creative digital experiences built for the web.",
-    ],
-    features: [],
-    genre: "",
-    secondaryGenres: [],
-    availability: "Coming Soon",
-    icon: Globe,
-    gradient: "from-[#3B4895] to-[#DE8A61]",
-  },
-];
-
-export default function Portfolio() {
   return (
     <section
       id="portfolio"
@@ -329,76 +179,20 @@ export default function Portfolio() {
           ===================================================== */}
 
       <div
-  className="
-    section-container
-    relative
-    z-10
-    w-full
-    portfolio-scroll-reveal
-  "
->
-  {/* =================================================
-      UNITY GAMES
-      ================================================= */}
-
-  <div className="mt-14 sm:mt-24">
-    <div className="mb-8 flex items-center gap-3">
-      <span className="pixel-dot" />
-
-      <h3 className="font-ethnocentric text-xl font-normal tracking-[0.02em] text-[#F0CA77] sm:text-4xl">
-        Unity Games
-      </h3>
-    </div>
-  </div>
-
-  <div>
-    <p className="text-sm leading-relaxed text-[#C5BFD0] sm:text-lg md:text-xl">
-      Each game explores a different idea, world, and style of play.
-    </p>
-  </div>
-<div className="mt-10 sm:mt-14">
-  <PortfolioCarousel
-    items={portfolioItems}
-    carouselId="unity-games"
-    itemTypeLabel="game"
-  />
-</div>
-  {/* =================================================
-      DIVIDER BETWEEN PORTFOLIO CATEGORIES
-      ================================================= */}
-
-  <div className="my-14 sm:my-24 lg:my-28">
-    <div className="h-px w-full bg-white/10" />
-  </div>
-
-  {/* =================================================
-      OTHER SERVICES
-      ================================================= */}
-
-  <div>
-    <div className="mb-8 flex items-center gap-3">
-      <span className="pixel-dot" />
-
-      <h3 className="font-ethnocentric text-xl font-normal tracking-[0.02em] text-[#F0CA77] sm:text-3xl">
-        Other Services We Offer
-      </h3>
-    </div>
-  </div>
-
-  <div>
-    <p className="text-sm leading-relaxed text-[#C5BFD0] sm:text-lg md:text-xl">
-      Each project brings a different idea to life through applications and websites.
-    </p>
-  </div>
-<div className="mt-10 sm:mt-14">
-  <PortfolioCarousel
-    items={otherServiceItems}
-    carouselId="other-services"
-    itemTypeLabel="service"
-  />
-  </div>
-</div>
-
+        className="
+          section-container
+          relative
+          z-10
+          w-full
+          portfolio-scroll-reveal
+        "
+      >
+        <PortfolioSections
+          categories={categories}
+          projects={projects}
+          details={details}
+        />
+      </div>
     </section>
   );
 }

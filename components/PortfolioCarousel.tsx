@@ -14,20 +14,54 @@ import {
   useState,
 } from "react";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import Image from "next/image";
 import type { PortfolioItem } from "@/types/portfolio";
 
 type PortfolioCarouselProps = {
   items: PortfolioItem[];
   carouselId: string;
-  itemTypeLabel: string;
 };
+
+type PointerStart = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  lastX: number;
+  lastY: number;
+};
+
+function PortfolioArtwork({
+  src,
+  title,
+}: {
+  src?: string;
+  title: string;
+}) {
+  const [hasError, setHasError] = useState(false);
+
+  const imageSrc = src && !hasError
+    ? src
+    : "/images/a-logo.png";
+
+  return (
+    <div className="relative mx-auto h-44 w-44 overflow-hidden rounded-2xl bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A61]/15 sm:h-56 sm:w-56">
+      <Image
+        src={imageSrc}
+        alt={src && !hasError ? `${title} artwork` : "AKIVSOFT logo"}
+        width={300}
+        height={300}
+        sizes="(min-width: 768px) 224px, 176px"
+        onError={() => setHasError(true)}
+        className="h-full w-full object-contain p-4 drop-shadow-[0_18px_28px_rgba(0,0,0,0.35)]"
+      />
+    </div>
+  );
+}
 
 export default function PortfolioCarousel({
   items,
   carouselId,
-  itemTypeLabel,
 }: PortfolioCarouselProps) {
   const totalItems = items.length;
 
@@ -56,6 +90,11 @@ export default function PortfolioCarousel({
   const pageScrollStartedRef = useRef(false);
   const transitionIdRef = useRef(0);
 
+  // Swipe and drag references.
+  const pointerStartRef = useRef<PointerStart | null>(null);
+  const suppressClickRef = useRef(false);
+  const suppressClickTimeoutRef = useRef<number | null>(null);
+
   const getRelativePosition = useCallback(
     (index: number) => {
       let difference = index - activeIndex;
@@ -83,6 +122,169 @@ export default function PortfolioCarousel({
       setIsManuallyPaused(false);
     }, 5000);
   }, []);
+
+  /*
+   * Start a swipe or drag gesture.
+   *
+   * Interactive controls are excluded, except side cards,
+   * which remain draggable while preserving their click action.
+   */
+  const handlePointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (
+        isClosing ||
+        isDetailsOpen ||
+        totalItems <= 1 ||
+        !event.isPrimary
+      ) {
+        return;
+      }
+
+      if (event.pointerType === "mouse" && event.button !== 0) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (!(target instanceof Element)) return;
+
+      if (
+        target.closest(
+          'button:not([data-carousel-swipe]), a, input, textarea, select, [contenteditable="true"], [data-carousel-no-swipe]',
+        )
+      ) {
+        return;
+      }
+
+      pointerStartRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        lastX: event.clientX,
+        lastY: event.clientY,
+      };
+    },
+    [isClosing, isDetailsOpen, totalItems],
+  );
+
+  /*
+   * Track the pointer position.
+   * Vertical movement is left to the browser so normal page
+   * scrolling continues to work.
+   */
+  const handlePointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const pointer = pointerStartRef.current;
+
+      if (!pointer || pointer.pointerId !== event.pointerId) {
+        return;
+      }
+
+      pointer.lastX = event.clientX;
+      pointer.lastY = event.clientY;
+    },
+    [],
+  );
+
+  /*
+   * Complete a swipe or drag.
+   *
+   * A gesture must be at least 55px and predominantly horizontal.
+   */
+  const handlePointerUp = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const pointer = pointerStartRef.current;
+
+      if (!pointer || pointer.pointerId !== event.pointerId) {
+        return;
+      }
+
+      pointerStartRef.current = null;
+
+      const deltaX = event.clientX - pointer.startX;
+      const deltaY = event.clientY - pointer.startY;
+
+      const horizontalDistance = Math.abs(deltaX);
+      const verticalDistance = Math.abs(deltaY);
+
+      if (
+        horizontalDistance < 55 ||
+        horizontalDistance <= verticalDistance * 1.25
+      ) {
+        return;
+      }
+
+      if (isClosing || isDetailsOpen) return;
+
+      // Prevent a drag from triggering the side-card click.
+      suppressClickRef.current = true;
+
+      if (suppressClickTimeoutRef.current !== null) {
+        window.clearTimeout(suppressClickTimeoutRef.current);
+      }
+
+      suppressClickTimeoutRef.current = window.setTimeout(() => {
+        suppressClickRef.current = false;
+        suppressClickTimeoutRef.current = null;
+      }, 400);
+
+      setIsManuallyPaused(true);
+      scheduleResume();
+
+      if (deltaX < 0) {
+        // Swipe left: next project.
+        transitionToRef.current?.("next");
+      } else {
+        // Swipe right: previous project.
+        transitionToRef.current?.("previous");
+      }
+    },
+    [isClosing, isDetailsOpen, scheduleResume],
+  );
+
+  const handlePointerCancel = useCallback(() => {
+    pointerStartRef.current = null;
+  }, []);
+
+  const handleCarouselKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      if (
+        isClosing ||
+        isDetailsOpen ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (
+        target instanceof Element &&
+        target.closest(
+          'button, a, input, textarea, select, [contenteditable="true"]',
+        )
+      ) {
+        return;
+      }
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setIsManuallyPaused(true);
+        scheduleResume();
+        transitionToRef.current?.("next");
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setIsManuallyPaused(true);
+        scheduleResume();
+        transitionToRef.current?.("previous");
+      }
+    },
+    [isClosing, isDetailsOpen, scheduleResume],
+  );
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -125,8 +327,6 @@ export default function PortfolioCarousel({
 
   /*
    * Pause autoplay while the user scrolls the page.
-   * This prevents card transitions from interfering with
-   * smooth scrolling and other vertically animated sections.
    */
   useEffect(() => {
     if (!isInView) return;
@@ -168,9 +368,6 @@ export default function PortfolioCarousel({
   /**
    * Collapse the expanded details before reversing the card's
    * existing opening animation and activating the next card.
-   *
-   * Important: this function never changes the window scroll
-   * position. Page scrolling remains under the user's control.
    */
   const transitionTo = useCallback(
     (index: number, manual = false) => {
@@ -200,9 +397,6 @@ export default function PortfolioCarousel({
         return;
       }
 
-      /*
-       * Capture animations before the expanded state changes.
-       */
       const openingAnimations = card
         .getAnimations({ subtree: true })
         .filter((animation) => {
@@ -289,11 +483,6 @@ export default function PortfolioCarousel({
         Promise.all(finishedPromises).then(finishTransition);
       };
 
-      /*
-       * Allow React to apply the collapsed layout first.
-       * Then wait for the details transition before reversing
-       * the original card animation.
-       */
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
           if (transitionId !== transitionIdRef.current) {
@@ -357,6 +546,14 @@ export default function PortfolioCarousel({
     ],
   );
 
+  /*
+   * Keep a current navigation callback available to pointer
+   * and keyboard handlers without creating stale closures.
+   */
+  const transitionToRef = useRef<
+    ((direction: "next" | "previous") => void) | null
+  >(null);
+
   const selectCard = useCallback(
     (index: number) => {
       transitionTo(index, true);
@@ -384,6 +581,16 @@ export default function PortfolioCarousel({
       true,
     );
   }, [activeIndex, totalItems, transitionTo]);
+
+  useEffect(() => {
+    transitionToRef.current = (direction) => {
+      if (direction === "next") {
+        next();
+      } else {
+        previous();
+      }
+    };
+  }, [next, previous]);
 
   /*
    * Autoplay is disabled during page scrolling, hover,
@@ -413,6 +620,10 @@ export default function PortfolioCarousel({
 
       if (pageScrollTimeoutRef.current !== null) {
         window.clearTimeout(pageScrollTimeoutRef.current);
+      }
+
+      if (suppressClickTimeoutRef.current !== null) {
+        window.clearTimeout(suppressClickTimeoutRef.current);
       }
 
       transitionId.current++;
@@ -455,7 +666,20 @@ export default function PortfolioCarousel({
             items-center
             justify-center
           "
-          style={{ perspective: "1800px" }}
+          style={{
+            perspective: "1800px",
+            touchAction: "pan-y",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerCancel}
+          onKeyDown={handleCarouselKeyDown}
+          tabIndex={0}
+          role="region"
+          aria-label="Portfolio carousel. Use the left and right arrow keys to navigate."
         >
           {items.map((item, index) => {
             const detailsId =
@@ -504,12 +728,12 @@ export default function PortfolioCarousel({
                     `}
                   >
                     {item.title ? (
-                      <div
-                        className="portfolio-game-content-reveal relative flex max-h-full flex-col overflow-hidden rounded-[2rem] bg-[#111225] p-5 sm:p-8"
-                      >
+                      <div className="portfolio-game-content-reveal relative flex max-h-full flex-col overflow-hidden rounded-[2rem] bg-[#111225] p-5 sm:p-8">
                         <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#3B4895]/20 blur-[44px] sm:blur-[100px]" />
 
                         <div className="pointer-events-none absolute -bottom-32 -left-28 h-72 w-72 rounded-full bg-[#DE8A61]/10 blur-[44px] sm:blur-[100px]" />
+
+                        {/* COLLAPSED CONTENT */}
 
                         <div
                           aria-hidden={isDetailsOpen}
@@ -520,97 +744,89 @@ export default function PortfolioCarousel({
                               : "opacity-100"
                           }`}
                         >
-                          <div className="relative grid shrink-0 items-center gap-4 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A61]/15 p-5 sm:grid-cols-[1fr_auto] sm:p-7">
-                          <div className="relative z-10">
-                            <div className="mb-6 flex flex-wrap items-center gap-3">
-                              <span className="font-[var(--font-rajdhani)] text-[10px] tracking-[0.24em] text-white/55">
-                                {item.kind ?? "Game"} {item.number}
-                              </span>
+                          <div className="relative grid shrink-0 items-center gap-4 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#3B4895]/25 via-[#17182f] to-[#DE8A8A]/15 p-5 sm:grid-cols-[1fr_auto] sm:p-7">
+                            <div className="relative z-10">
+                              <div className="mb-6 flex flex-wrap items-center gap-3">
+                                <span className="font-[var(--font-rajdhani)] text-[10px] tracking-[0.24em] text-white/55">
+                                  {item.kind ?? "Game"} {item.number}
+                                </span>
 
-                              <span className="inline-flex items-center gap-2 rounded-full bg-[#F0CA77]/10 px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] tracking-[0.16em] text-[#F0CA77]">
-                                <span className="h-1.5 w-1.5 rounded-full bg-[#F0CA77] shadow-[0_0_10px_#F0CA77]" />
-                                {item.availability}
-                              </span>
+                                <span className="inline-flex items-center gap-2 rounded-full bg-[#F0CA77]/10 px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] tracking-[0.16em] text-[#F0CA77]">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-[#F0CA77] shadow-[0_0_10px_#F0CA77]" />
+                                  {item.availability}
+                                </span>
+                              </div>
+
+                              {item.category && (
+                                <p className="mb-3 font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.2em] text-white/55">
+                                  {item.category}
+                                </p>
+                              )}
+
+                              <h3 className="font-ethnocentric text-3xl font-normal leading-tight tracking-[-0.04em] text-white sm:text-4xl md:text-5xl">
+                                {item.title}
+                              </h3>
+
+                              {item.tagline && (
+                                <p className="mt-3 font-[var(--font-rajdhani)] text-lg font-semibold tracking-[0.2em] text-[#F0CA77] sm:text-xl">
+                                  {item.tagline}
+                                </p>
+                              )}
                             </div>
 
-                            {item.category && (
-                              <p className="mb-3 font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.2em] text-white/55">
-                                {item.category}
-                              </p>
-                            )}
-
-                            <h3 className="font-ethnocentric text-3xl font-normal leading-tight tracking-[-0.04em] text-white sm:text-4xl md:text-5xl">
-                              {item.title}
-                            </h3>
-
-                            {item.tagline && (
-                              <p className="mt-3 font-[var(--font-rajdhani)] text-lg font-semibold tracking-[0.2em] text-[#F0CA77] sm:text-xl">
-                                {item.tagline}
-                              </p>
-                            )}
+                            <PortfolioArtwork
+                              src={item.image}
+                              title={item.title}
+                            />
                           </div>
 
-                          {item.image && (
-                            <div className="relative mx-auto h-44 w-44 sm:h-56 sm:w-56">
-                              <Image
-                                src={item.image}
-                                alt={`${item.title} artwork`}
-                                width={300}
-                                height={300}
-                                sizes="(min-width: 768px) 224px, 176px"
-                                className="h-full w-full object-contain drop-shadow-[0_18px_28px_rgba(0,0,0,0.35)]"
-                              />
-                            </div>
-                          )}
-                          </div>
+                          <button
+                            type="button"
+                            aria-expanded={false}
+                            aria-controls={detailsId}
+                            onClick={(event) => {
+                              event.stopPropagation();
 
-                        <button
-                          type="button"
-                          aria-expanded={false}
-                          aria-controls={detailsId}
-                          onClick={(event) => {
-                            event.stopPropagation();
+                              if (isClosing) return;
 
-                            if (isClosing) return;
+                              setExpandedIndex(index);
+                              setIsManuallyPaused(true);
 
-                            setExpandedIndex(index);
-                            setIsManuallyPaused(true);
+                              if (resumeTimeoutRef.current !== null) {
+                                window.clearTimeout(
+                                  resumeTimeoutRef.current,
+                                );
+                                resumeTimeoutRef.current = null;
+                              }
+                            }}
+                            className="mt-6 flex min-h-12 w-full shrink-0 items-center justify-between rounded-xl border border-[#F0CA77]/25 bg-[#F0CA77]/[0.045] px-4 text-left transition-colors duration-300 hover:border-[#F0CA77]/55 hover:bg-[#F0CA77]/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CA77]/70"
+                          >
+                            <span className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.22em] text-[#F0CA77]">
+                              Show more
+                            </span>
 
-                            if (resumeTimeoutRef.current !== null) {
-                              window.clearTimeout(
-                                resumeTimeoutRef.current,
-                              );
-                              resumeTimeoutRef.current = null;
-                            }
-                          }}
-                          className="mt-6 flex min-h-12 w-full shrink-0 items-center justify-between rounded-xl border border-[#F0CA77]/25 bg-[#F0CA77]/[0.045] px-4 text-left transition-colors duration-300 hover:border-[#F0CA77]/55 hover:bg-[#F0CA77]/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CA77]/70"
-                        >
-                          <span className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.22em] text-[#F0CA77]">
-                            Show more
-                          </span>
-
-                          <ChevronDown
-                            size={17}
-                            aria-hidden="true"
-                            className="text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none"
-                          />
-                        </button>
+                            <ChevronDown
+                              size={17}
+                              aria-hidden="true"
+                              className="text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none"
+                            />
+                          </button>
                         </div>
+
+                        {/* EXPANDED CONTENT */}
 
                         <div
                           id={detailsId}
                           aria-hidden={!isDetailsOpen}
                           inert={!isDetailsOpen}
-                          className={`absolute inset-0 z-10 flex min-h-0 flex-col rounded-[2rem] bg-[#111225] p-5 transition-opacity duration-300 ease-in-out motion-reduce:transition-none sm:p-8 ${
+                          className={`absolute inset-x-0 top-0 bottom-[76px] z-10 flex min-h-0 flex-col rounded-[2rem] bg-[#111225] p-5 transition-opacity duration-300 ease-in-out motion-reduce:transition-none sm:p-8 ${
                             isDetailsOpen
                               ? "opacity-100"
                               : "pointer-events-none opacity-0"
                           }`}
                         >
                           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                            <div
-                              className="pt-7 transition-transform duration-300 motion-reduce:transition-none"
-                            >
+                            <div className="pt-7 transition-transform duration-300 motion-reduce:transition-none">
                               <section className="relative">
                                 <h4 className="mb-3 font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.26em] text-[#DE8A61]">
                                   Description
@@ -788,14 +1004,6 @@ export default function PortfolioCarousel({
                             </div>
                           </div>
 
-                        {item.platforms?.length ? (
-                          <div className="mt-5 flex justify-start border-t border-white/[0.06] pt-4">
-                            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] tracking-[0.16em] text-white/70">
-                              Platforms: {item.platforms.join(", ")}
-                            </span>
-                          </div>
-                        ) : null}
-
                           <button
                             type="button"
                             aria-expanded={isDetailsOpen}
@@ -820,7 +1028,17 @@ export default function PortfolioCarousel({
                               className="rotate-180 text-[#F0CA77] transition-transform duration-300 motion-reduce:transition-none"
                             />
                           </button>
-                      </div>
+                        </div>
+
+                        {/* PLATFORMS: ALWAYS VISIBLE */}
+
+                        {item.platforms?.length ? (
+                          <div className="relative z-20 mt-4 flex shrink-0 justify-start border-t border-white/[0.06] pt-4">
+                            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] tracking-[0.16em] text-white/70">
+                              Platforms: {item.platforms.join(", ")}
+                            </span>
+                          </div>
+                        ) : null}
                       </div>
                     ) : (
                       <div className="portfolio-game-content-reveal relative flex min-h-[340px] flex-col items-center justify-center overflow-hidden rounded-[2rem] bg-[#111225] p-8 text-center sm:min-h-[400px]">
@@ -889,7 +1107,23 @@ export default function PortfolioCarousel({
               >
                 <button
                   type="button"
-                  onClick={() => selectCard(index)}
+                  data-carousel-swipe
+                  onClick={() => {
+                    if (suppressClickRef.current) {
+                      suppressClickRef.current = false;
+
+                      if (suppressClickTimeoutRef.current !== null) {
+                        window.clearTimeout(
+                          suppressClickTimeoutRef.current,
+                        );
+                        suppressClickTimeoutRef.current = null;
+                      }
+
+                      return;
+                    }
+
+                    selectCard(index);
+                  }}
                   aria-label={`Select ${item.title || `game ${item.number}`}`}
                   className="
                     group
@@ -982,11 +1216,7 @@ export default function PortfolioCarousel({
             type="button"
             onClick={previous}
             disabled={totalItems <= 1 || isClosing}
-            aria-label={
-              itemTypeLabel === "game"
-                ? "Previous portfolio item"
-                : "Previous service item"
-            }
+            aria-label="Previous portfolio item"
             className="
               flex
               h-11
@@ -1019,9 +1249,7 @@ export default function PortfolioCarousel({
                 onClick={() => selectCard(index)}
                 disabled={isClosing}
                 aria-label={
-                  "Go to " +
-                  itemTypeLabel +
-                  " " +
+                  "Go to portfolio item " +
                   item.number +
                   (item.title
                     ? ": " + item.title
@@ -1030,7 +1258,7 @@ export default function PortfolioCarousel({
                 aria-current={
                   index === activeIndex ? "true" : undefined
                 }
-                className={`
+                className="
                   flex
                   h-11
                   w-11
@@ -1040,7 +1268,7 @@ export default function PortfolioCarousel({
                   justify-center
                   rounded-full
                   disabled:cursor-not-allowed
-                `}
+                "
               >
                 <span
                   aria-hidden="true"
@@ -1065,11 +1293,7 @@ export default function PortfolioCarousel({
             type="button"
             onClick={next}
             disabled={totalItems <= 1 || isClosing}
-            aria-label={
-              itemTypeLabel === "game"
-                ? "Next portfolio item"
-                : "Next service item"
-            }
+            aria-label="Next portfolio item"
             className="
               flex
               h-11

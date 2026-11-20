@@ -1,3 +1,4 @@
+
 import { ArrowUpRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -7,7 +8,19 @@ type ServiceCardProps = {
   description: string;
   tags: string[];
   icon: LucideIcon;
-  accent: "blue" | "purple" | "cyan" | "pink";
+  accent:
+    | "blue"
+    | "purple"
+    | "cyan"
+    | "pink"
+    | "orange"
+    | "gold"
+    | "red"
+    | "green"
+    | "teal"
+    | "indigo"
+    | "violet"
+    | "rose";
 };
 
 const accentClasses = {
@@ -15,6 +28,14 @@ const accentClasses = {
   purple: "text-[#C59DD3]",
   cyan: "text-[#DE8A61]",
   pink: "text-[#E39AAE]",
+  orange: "text-[#F0A36B]",
+  gold: "text-[#F0CA77]",
+  red: "text-[#E87878]",
+  green: "text-[#91C99A]",
+  teal: "text-[#79C8C1]",
+  indigo: "text-[#8997E8]",
+  violet: "text-[#B69AE8]",
+  rose: "text-[#E39AAF]",
 };
 
 export default function ServiceCard({
