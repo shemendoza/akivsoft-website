@@ -61,7 +61,9 @@ function revalidateServices() {
 
 function redirectWithSuccess(key: string): never {
   revalidateServices();
-  redirect(`${ADMIN_PATH}?${key}=1`);
+  redirect(
+    `${ADMIN_PATH}?success=${encodeURIComponent(key)}`
+  );
 }
 
 async function getNextSectionOrder(
@@ -322,21 +324,60 @@ export async function deleteServiceSection(formData: FormData) {
 
   const supabase = await createClient();
 
-  const { error } = await supabase
+  // Prevent deletion while the section still contains services
+  // or an additional content block.
+  const [
+    { count: serviceCount, error: serviceCountError },
+    { count: contentBlockCount, error: contentBlockCountError },
+  ] = await Promise.all([
+    supabase
+      .from("services")
+      .select("id", { count: "exact", head: true })
+      .eq("section_id", id),
+    supabase
+      .from("service_content_blocks")
+      .select("id", { count: "exact", head: true })
+      .eq("service_section_id", id),
+  ]);
+
+  if (serviceCountError || contentBlockCountError) {
+    console.error("Check service section contents failed:", {
+      serviceCountError,
+      contentBlockCountError,
+    });
+
+    redirectWithError(
+      "Unable to verify whether this section can be deleted."
+    );
+  }
+
+  if ((serviceCount ?? 0) > 0 || (contentBlockCount ?? 0) > 0) {
+    redirectWithError(
+      "This section cannot be deleted while it contains services or an additional content block. Delete those items first."
+    );
+  }
+
+  const { data, error } = await supabase
     .from("service_sections")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     console.error("Delete service section failed:", error);
 
     if (error.code === "23503") {
       redirectWithError(
-        "This section still contains services. Delete or move its services before deleting the section."
+        "This section still contains related content. Delete or move that content before deleting the section."
       );
     }
 
     redirectWithError("Unable to delete the service section.");
+  }
+
+  if (!data) {
+    redirectWithError("The service section could not be found.");
   }
 
   redirectWithSuccess("sectionDeleted");
@@ -577,10 +618,10 @@ export async function createServiceContentBlock(
     getText(formData, "block_type")
   );
 
- const eyebrow = getText(formData, "eyebrow");
-const heading = getText(formData, "heading");
-const gradientText = getText(formData, "gradient_text");
-const itemsHeading = getText(formData, "items_heading");
+  const eyebrow = getText(formData, "eyebrow");
+  const heading = getText(formData, "heading");
+  const gradientText = getText(formData, "gradient_text");
+  const itemsHeading = getText(formData, "items_heading");
   const description = getText(formData, "description");
 
   const items = getContentBlockItems(
@@ -661,46 +702,52 @@ const itemsHeading = getText(formData, "items_heading");
     );
   }
 
+  let displayOrder: number;
+
   try {
-    const displayOrder = await getNextContentBlockOrder(
-      supabase
-    );
-
-    const { error } = await supabase
-      .from("service_content_blocks")
-      .insert({
-        service_section_id: serviceSectionId,
-        service_id: null,
-        block_type: blockType,
-        eyebrow: eyebrow || null,
-heading,
-gradient_text: gradientText || null,
-items_heading:
-  blockType === "list" ? itemsHeading : "",
-        description,
-        items,
-        layout_position: layoutPosition,
-        display_order: displayOrder,
-        is_published: false,
-      });
-
-    if (error) {
-      if (error.code === "23505") {
-        redirectWithError(
-          "This section already has a content block. Each section can have only one."
-        );
-      }
-
-      throw error;
-    }
+    displayOrder = await getNextContentBlockOrder(supabase);
   } catch (error) {
     console.error(
-      "Create service content block failed:",
+      "Get next service content block order failed:",
       error
     );
 
     redirectWithError(
-      "Unable to create the content block."
+      "Unable to determine the content block display order."
+    );
+  }
+
+  const { error: insertError } = await supabase
+    .from("service_content_blocks")
+    .insert({
+      service_section_id: serviceSectionId,
+      service_id: null,
+      block_type: blockType,
+      eyebrow: eyebrow || null,
+      heading,
+      gradient_text: gradientText || null,
+      items_heading: blockType === "list" ? itemsHeading : "",
+      description,
+      items,
+      layout_position: layoutPosition,
+      display_order: displayOrder,
+      is_published: false,
+    });
+
+  if (insertError) {
+    console.error(
+      "Create service content block failed:",
+      insertError
+    );
+
+    if (insertError.code === "23505") {
+      redirectWithError(
+        "This section already has a content block. Each section can have only one."
+      );
+    }
+
+    redirectWithError(
+      "Unable to create the content block. Check the server log for the database error."
     );
   }
 
@@ -719,9 +766,9 @@ export async function updateServiceContentBlock(
   );
 
   const eyebrow = getText(formData, "eyebrow");
-const heading = getText(formData, "heading");
-const gradientText = getText(formData, "gradient_text");
-const itemsHeading = getText(formData, "items_heading");
+  const heading = getText(formData, "heading");
+  const gradientText = getText(formData, "gradient_text");
+  const itemsHeading = getText(formData, "items_heading");
   const description = getText(formData, "description");
 
   const items = getContentBlockItems(
@@ -758,10 +805,9 @@ const itemsHeading = getText(formData, "items_heading");
     .update({
       block_type: blockType,
       eyebrow: eyebrow || null,
-heading,
-gradient_text: gradientText || null,
-items_heading:
-  blockType === "list" ? itemsHeading : "",
+      heading,
+      gradient_text: gradientText || null,
+      items_heading: blockType === "list" ? itemsHeading : "",
       description,
       items,
       layout_position: layoutPosition,

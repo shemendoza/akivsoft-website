@@ -2,6 +2,19 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Plus,
+  Trash2,
+  Eye,
+  EyeOff,
+  X,
+  ChevronDown,
+  ChevronUp,
+  ArrowUp,
+  ArrowDown,
+  Check,
+} from "lucide-react";
+
 import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
 
 import {
@@ -177,20 +190,46 @@ export default function ServiceContentBlockManager({
     });
   }
 
-  function renderItemsField() {
-    const items: ServiceContentBlockItem[] =
-      blockType === "list" ? listItems : featureItems;
-
-    return (
-      <input
-        type="hidden"
-        name="items"
-        value={JSON.stringify(items)}
-      />
-    );
-  }
-
   function renderEditor(isNew: boolean) {
+    // Include completed text in the submission even when Add Item
+    // or Add Feature has not been clicked.
+    const submittedListItems = [
+      ...listItems,
+      ...(newListItem.trim() ? [newListItem.trim()] : []),
+    ];
+
+    const pendingFeatureTitle = newFeatureItem.title.trim();
+    const pendingFeatureDescription =
+      newFeatureItem.description.trim();
+
+    const hasPendingFeature =
+      pendingFeatureTitle.length > 0 &&
+      pendingFeatureDescription.length > 0;
+
+    const submittedFeatureItems = [
+      ...featureItems,
+      ...(hasPendingFeature
+        ? [
+            {
+              title: pendingFeatureTitle,
+              description: pendingFeatureDescription,
+            },
+          ]
+        : []),
+    ];
+
+    const submittedItems: ServiceContentBlockItem[] =
+      blockType === "list"
+        ? submittedListItems
+        : submittedFeatureItems;
+
+    const canSubmit =
+      heading.trim().length > 0 &&
+      (blockType === "list"
+        ? itemsHeading.trim().length > 0 &&
+          submittedListItems.length > 0
+        : submittedFeatureItems.length > 0);
+
     return (
       <form
         action={
@@ -229,8 +268,26 @@ export default function ServiceContentBlockManager({
         />
         <input type="hidden" name="description" value={description} />
         <input type="hidden" name="layout_position" value={position} />
+        <input
+          type="hidden"
+          name="items"
+          value={JSON.stringify(submittedItems)}
+        />
 
-        {renderItemsField()}
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#DE8A61]">
+            {isNew ? "New Content Block" : "Edit Content Block"}
+          </p>
+
+          <button
+            type="button"
+            onClick={resetEditor}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs text-[#C5BFD0] transition hover:border-white/40 hover:text-[#FFFDF8]"
+          >
+            <X size={13} />
+            Close Editor
+          </button>
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm text-[#C5BFD0]">
@@ -348,7 +405,7 @@ export default function ServiceContentBlockManager({
                     className="rounded px-2 py-1 text-[#C5BFD0] hover:text-[#F0CA77] disabled:opacity-30"
                     aria-label="Move item up"
                   >
-                    ↑
+                    <ArrowUp size={14} />
                   </button>
 
                   <button
@@ -358,7 +415,7 @@ export default function ServiceContentBlockManager({
                     className="rounded px-2 py-1 text-[#C5BFD0] hover:text-[#F0CA77] disabled:opacity-30"
                     aria-label="Move item down"
                   >
-                    ↓
+                    <ArrowDown size={14} />
                   </button>
 
                   <button
@@ -371,7 +428,7 @@ export default function ServiceContentBlockManager({
                     className="rounded px-2 py-1 text-red-300 hover:text-red-200"
                     aria-label="Remove item"
                   >
-                    ×
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}
@@ -393,8 +450,9 @@ export default function ServiceContentBlockManager({
                 <button
                   type="button"
                   onClick={addListItem}
-                  className="rounded-lg border border-[#DE8A61]/40 px-4 py-3 text-sm text-[#F0CA77] transition hover:bg-[#DE8A61]/10"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#DE8A61]/40 px-4 py-3 text-sm text-[#F0CA77] transition hover:bg-[#DE8A61]/10"
                 >
+                  <Plus size={15} />
                   Add Item
                 </button>
               </div>
@@ -418,7 +476,7 @@ export default function ServiceContentBlockManager({
                       className="rounded px-2 py-1 text-[#C5BFD0] hover:text-[#F0CA77] disabled:opacity-30"
                       aria-label="Move item up"
                     >
-                      ↑
+                      <ArrowUp size={14} />
                     </button>
 
                     <button
@@ -428,7 +486,7 @@ export default function ServiceContentBlockManager({
                       className="rounded px-2 py-1 text-[#C5BFD0] hover:text-[#F0CA77] disabled:opacity-30"
                       aria-label="Move item down"
                     >
-                      ↓
+                      <ArrowDown size={14} />
                     </button>
 
                     <button
@@ -441,7 +499,7 @@ export default function ServiceContentBlockManager({
                       className="rounded px-2 py-1 text-red-300 hover:text-red-200"
                       aria-label="Remove item"
                     >
-                      ×
+                      <Trash2 size={14} />
                     </button>
                   </div>
 
@@ -484,8 +542,9 @@ export default function ServiceContentBlockManager({
                 <button
                   type="button"
                   onClick={addFeatureItem}
-                  className="rounded-lg border border-[#DE8A61]/40 px-4 py-2 text-sm text-[#F0CA77] transition hover:bg-[#DE8A61]/10"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[#DE8A61]/40 px-4 py-2 text-sm text-[#F0CA77] transition hover:bg-[#DE8A61]/10"
                 >
+                  <Plus size={15} />
                   Add Feature
                 </button>
               </div>
@@ -496,22 +555,19 @@ export default function ServiceContentBlockManager({
         <div className="flex flex-wrap gap-3 border-t border-white/10 pt-4">
           <PendingSubmitButton
             pendingText={isNew ? "Creating..." : "Saving..."}
-            disabled={
-              !heading.trim() ||
-              (blockType === "list"
-                ? !itemsHeading.trim() || listItems.length === 0
-                : featureItems.length === 0)
-            }
-            className="rounded-lg bg-gradient-to-r from-[#934C60] to-[#DE8A61] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!canSubmit}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#934C60] to-[#DE8A61] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
           >
+            <Check size={15} />
             {isNew ? "Create Content Block" : "Save Changes"}
           </PendingSubmitButton>
 
           <button
             type="button"
             onClick={resetEditor}
-            className="rounded-lg border border-white/15 px-5 py-3 text-sm text-[#C5BFD0] transition hover:border-white/30 hover:text-white"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-5 py-3 text-sm text-[#C5BFD0] transition hover:border-white/30 hover:text-white"
           >
+            <X size={15} />
             Cancel
           </button>
         </div>
@@ -538,9 +594,10 @@ export default function ServiceContentBlockManager({
           <button
             type="button"
             onClick={startCreating}
-            className="shrink-0 rounded-lg border border-[#DE8A61]/40 px-4 py-2.5 text-sm font-semibold text-[#F0CA77] transition hover:bg-[#DE8A61]/10"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-[#DE8A61]/40 px-4 py-2.5 text-sm font-semibold text-[#F0CA77] transition hover:bg-[#DE8A61]/10"
           >
-            + Add Content Block
+            <Plus size={15} />
+            Add Content Block
           </button>
         )}
       </div>
@@ -587,12 +644,16 @@ export default function ServiceContentBlockManager({
                 {block.heading}
               </span>
 
-              <span className="shrink-0 px-1 text-lg text-[#F0CA77]">
-                {isExpanded ? "−" : "+"}
+              <span className="shrink-0 rounded-lg border border-white/10 p-2 text-[#F0CA77]">
+                {isExpanded ? (
+                  <ChevronUp size={15} />
+                ) : (
+                  <ChevronDown size={15} />
+                )}
               </span>
             </button>
 
-            <div className="flex shrink-0 flex-wrap gap-2">
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
               <form action={toggleServiceContentBlockPublished}>
                 <input type="hidden" name="id" value={block.id} />
 
@@ -600,8 +661,13 @@ export default function ServiceContentBlockManager({
                   pendingText={
                     block.is_published ? "Unpublishing..." : "Publishing..."
                   }
-                  className="rounded-lg border border-white/10 px-3 py-2 text-xs text-[#C5BFD0] transition hover:border-[#F0CA77]/40 hover:text-[#F0CA77]"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs text-[#C5BFD0] transition hover:border-[#F0CA77]/40 hover:text-[#F0CA77]"
                 >
+                  {block.is_published ? (
+                    <EyeOff size={13} />
+                  ) : (
+                    <Eye size={13} />
+                  )}
                   {block.is_published ? "Unpublish" : "Publish"}
                 </PendingSubmitButton>
               </form>
@@ -609,8 +675,11 @@ export default function ServiceContentBlockManager({
               <button
                 type="button"
                 onClick={startEditing}
-                className="rounded-lg border border-[#DE8A61]/30 px-3 py-2 text-xs text-[#F0CA77] transition hover:bg-[#DE8A61]/10"
+                className="rounded-lg border border-white/15 px-3 py-2 text-xs text-[#FFFDF8] transition hover:border-white/40 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
               >
+                <span aria-hidden="true" className="mr-1.5">
+                  ✎
+                </span>
                 Edit
               </button>
 
@@ -630,8 +699,9 @@ export default function ServiceContentBlockManager({
 
                 <PendingSubmitButton
                   pendingText="Deleting..."
-                  className="rounded-lg border border-red-400/20 px-3 py-2 text-xs text-red-300 transition hover:bg-red-400/10"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-red-400/20 px-3 py-2 text-xs text-red-300 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
+                  <Trash2 size={13} />
                   Delete
                 </PendingSubmitButton>
               </form>
@@ -677,10 +747,6 @@ export default function ServiceContentBlockManager({
 
           {isEditing && (
             <div className="mt-4 border-t border-white/10 pt-4">
-              <h4 className="font-semibold text-[#F0CA77]">
-                Edit Content Block
-              </h4>
-
               {renderEditor(false)}
             </div>
           )}

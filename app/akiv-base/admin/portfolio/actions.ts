@@ -29,37 +29,174 @@ function normalizeSlug(value: string) {
     .replace(/^-|-$/g, "");
 }
 
+function normalizeProjectContent(
+  value: Record<string, unknown>,
+  slug: string
+): Record<string, unknown> {
+  const content = { ...value };
+
+  content.detailsId = `${slug}-details`;
+
+  if (
+    typeof content.closing === "object" &&
+    content.closing !== null &&
+    !Array.isArray(content.closing)
+  ) {
+    const closing = {
+      ...(content.closing as Record<string, unknown>),
+    };
+
+    delete closing.tagline;
+
+    content.closing = closing;
+  }
+
+  return content;
+}
+
+function parseProjectContent(
+  value: string
+): Record<string, unknown> | null {
+  try {
+    const parsed: unknown = value ? JSON.parse(value) : {};
+
+    if (
+      typeof parsed !== "object" ||
+      parsed === null ||
+      Array.isArray(parsed)
+    ) {
+      return null;
+    }
+
+    return parsed as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function formatProjectNumber(index: number) {
+  return String(index + 1).padStart(2, "0");
+}
+
+/**
+ * Recalculates project display order and project numbers
+ * within one category.
+ *
+ * The existing display order is preserved. Project IDs provide
+ * deterministic ordering when two projects have the same order.
+ */
+async function synchronizeCategoryProjects(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  categoryId: string
+): Promise<boolean> {
+  const { data: projects, error: fetchError } = await supabase
+    .from("portfolio_projects")
+    .select("id, display_order")
+    .eq("category_id", categoryId)
+    .order("display_order", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (fetchError || !projects) {
+    console.error(
+      "Unable to retrieve projects for category synchronization:",
+      fetchError
+    );
+
+    return false;
+  }
+
+  for (let index = 0; index < projects.length; index++) {
+    const project = projects[index];
+
+    const { data, error } = await supabase
+      .from("portfolio_projects")
+      .update({
+        display_order: index + 1,
+        project_number: formatProjectNumber(index),
+      })
+      .eq("id", project.id)
+      .eq("category_id", categoryId)
+      .select("id")
+      .maybeSingle();
+
+    if (error || !data) {
+      console.error(
+        "Unable to synchronize portfolio project numbering:",
+        error
+      );
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+async function getNextProjectOrder(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  categoryId: string
+): Promise<number | null> {
+  const { data: projects, error } = await supabase
+    .from("portfolio_projects")
+    .select("id")
+    .eq("category_id", categoryId);
+
+  if (error || !projects) {
+    console.error(
+      "Unable to retrieve destination category projects:",
+      error
+    );
+
+    return null;
+  }
+
+  return projects.length + 1;
+}
+
+function validateProjectImage(image: File): string | null {
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+  if (!allowedTypes.includes(image.type)) {
+    return "Only JPEG, PNG, and WebP images are allowed.";
+  }
+
+  if (image.size > 10 * 1024 * 1024) {
+    return "Image must not exceed 10MB.";
+  }
+
+  return null;
+}
+
+function getImageExtension(image: File) {
+  return image.type === "image/jpeg"
+    ? "jpg"
+    : image.type === "image/png"
+      ? "png"
+      : "webp";
+}
+
 export async function createPortfolioProject(formData: FormData) {
   await requireAdmin();
 
   const supabase = await createClient();
 
   const title = getText(formData, "title");
-  const slug = getText(formData, "slug");
-  const projectNumber = getText(formData, "project_number");
+  const slug = normalizeSlug(title);
   const categoryId = getText(formData, "category_id");
   const shortDescription = getText(formData, "short_description");
-  const fullDetails = getText(formData, "full_details");
-  const displayOrderValue = getText(formData, "display_order");
   const contentValue = getText(formData, "content");
 
   if (!title || !slug || !categoryId || !shortDescription) {
     redirectWithError("Please complete all required project fields.");
   }
 
-  const displayOrder = Number.parseInt(displayOrderValue, 10);
+  const parsedContent = parseProjectContent(contentValue);
 
-  if (!Number.isInteger(displayOrder) || displayOrder < 0) {
-    redirectWithError("Invalid project display order.");
-  }
-
-  let content = {};
-
-  try {
-    content = contentValue ? JSON.parse(contentValue) : {};
-  } catch {
+  if (!parsedContent) {
     redirectWithError("Invalid project details format.");
   }
+
+  const content = normalizeProjectContent(parsedContent, slug);
 
   const { data: category, error: categoryError } = await supabase
     .from("portfolio_categories")
@@ -71,28 +208,23 @@ export async function createPortfolioProject(formData: FormData) {
     redirectWithError("Please select a valid category.");
   }
 
+  const displayOrder = await getNextProjectOrder(supabase, categoryId);
+
+  if (displayOrder === null) {
+    redirectWithError("Unable to determine the new project order.");
+  }
+
   const image = formData.get("image");
   let imagePath: string | null = null;
 
   if (image instanceof File && image.size > 0) {
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const imageError = validateProjectImage(image);
 
-    if (!allowedTypes.includes(image.type)) {
-      redirectWithError("Only JPEG, PNG, and WebP images are allowed.");
+    if (imageError) {
+      redirectWithError(imageError);
     }
 
-    if (image.size > 10 * 1024 * 1024) {
-      redirectWithError("Image must not exceed 10MB.");
-    }
-
-    const extension =
-      image.type === "image/jpeg"
-        ? "jpg"
-        : image.type === "image/png"
-          ? "png"
-          : "webp";
-
-    imagePath = `${crypto.randomUUID()}.${extension}`;
+    imagePath = `${crypto.randomUUID()}.${getImageExtension(image)}`;
 
     const { error: uploadError } = await supabase.storage
       .from("portfolio-images")
@@ -102,6 +234,7 @@ export async function createPortfolioProject(formData: FormData) {
       });
 
     if (uploadError) {
+      console.error("Portfolio image upload failed:", uploadError);
       redirectWithError("Unable to upload project image.");
     }
   }
@@ -111,11 +244,11 @@ export async function createPortfolioProject(formData: FormData) {
     .insert({
       title,
       slug,
-      project_number: projectNumber || null,
+      project_number: formatProjectNumber(displayOrder - 1),
       category_id: categoryId,
       image_path: imagePath,
       short_description: shortDescription,
-      full_details: fullDetails,
+      full_details: "",
       display_order: displayOrder,
       is_published: false,
     })
@@ -127,6 +260,13 @@ export async function createPortfolioProject(formData: FormData) {
       await supabase.storage.from("portfolio-images").remove([imagePath]);
     }
 
+    if (projectError?.code === "23505") {
+      redirectWithError(
+        "A project with this title or URL slug already exists. Please use a different title."
+      );
+    }
+
+    console.error("Portfolio project creation failed:", projectError);
     redirectWithError("Unable to create portfolio project.");
   }
 
@@ -147,7 +287,19 @@ export async function createPortfolioProject(formData: FormData) {
       await supabase.storage.from("portfolio-images").remove([imagePath]);
     }
 
+    console.error("Portfolio project details creation failed:", detailsError);
     redirectWithError("Unable to save project details.");
+  }
+
+  const synchronized = await synchronizeCategoryProjects(
+    supabase,
+    categoryId
+  );
+
+  if (!synchronized) {
+    console.error(
+      "The project was created, but its category numbering could not be synchronized."
+    );
   }
 
   revalidatePortfolio();
@@ -160,25 +312,28 @@ export async function createPortfolioCategory(formData: FormData) {
   const supabase = await createClient();
 
   const name = getText(formData, "name");
-  const slug = normalizeSlug(getText(formData, "slug"));
-  const sectionTitle = getText(formData, "section_title");
+  const slug = normalizeSlug(name);
   const sectionDescription = getText(formData, "section_description");
-  const displayOrderValue = getText(formData, "display_order");
 
-  if (!name || !slug || !sectionTitle || !sectionDescription) {
+  if (!name || !slug || !sectionDescription) {
     redirectWithError("Please complete all required category fields.");
   }
 
-  const displayOrder = Number(displayOrderValue);
+  const { count, error: countError } = await supabase
+    .from("portfolio_categories")
+    .select("id", { count: "exact", head: true });
 
-  if (!Number.isInteger(displayOrder) || displayOrder < 0) {
-    redirectWithError("Category display order must be a whole number of zero or greater.");
+  if (countError || count === null) {
+    console.error("Unable to determine the next category order:", countError);
+    redirectWithError("Unable to determine the new category order.");
   }
+
+  const displayOrder = count + 1;
 
   const { error } = await supabase.from("portfolio_categories").insert({
     name,
     slug,
-    section_title: sectionTitle,
+    section_title: name,
     section_description: sectionDescription,
     display_order: displayOrder,
     is_published: false,
@@ -186,9 +341,17 @@ export async function createPortfolioCategory(formData: FormData) {
 
   if (error) {
     if (error.code === "23505") {
-      redirectWithError("That category URL slug is already in use. Please choose another.");
+      redirectWithError(
+        "That category URL slug is already in use. Please use a different category name."
+      );
     }
 
+   console.error("Portfolio category creation failed:", {
+  code: error.code,
+  message: error.message,
+  details: error.details,
+  hint: error.hint,
+});
     redirectWithError("Unable to create portfolio category.");
   }
 
@@ -203,19 +366,11 @@ export async function updatePortfolioCategory(formData: FormData) {
 
   const id = getText(formData, "id");
   const name = getText(formData, "name");
-  const slug = normalizeSlug(getText(formData, "slug"));
-  const sectionTitle = getText(formData, "section_title");
+  const slug = normalizeSlug(name);
   const sectionDescription = getText(formData, "section_description");
-  const displayOrderValue = getText(formData, "display_order");
 
-  if (!id || !name || !slug || !sectionTitle || !sectionDescription) {
+  if (!id || !name || !slug || !sectionDescription) {
     redirectWithError("Please complete all required category fields.");
-  }
-
-  const displayOrder = Number(displayOrderValue);
-
-  if (!Number.isInteger(displayOrder) || displayOrder < 0) {
-    redirectWithError("Category display order must be a whole number of zero or greater.");
   }
 
   const { data, error } = await supabase
@@ -223,9 +378,8 @@ export async function updatePortfolioCategory(formData: FormData) {
     .update({
       name,
       slug,
-      section_title: sectionTitle,
+      section_title: name,
       section_description: sectionDescription,
-      display_order: displayOrder,
     })
     .eq("id", id)
     .select("id")
@@ -233,9 +387,12 @@ export async function updatePortfolioCategory(formData: FormData) {
 
   if (error) {
     if (error.code === "23505") {
-      redirectWithError("That category URL slug is already in use. Please choose another.");
+      redirectWithError(
+        "That category URL slug is already in use. Please use a different category name."
+      );
     }
 
+    console.error("Portfolio category update failed:", error);
     redirectWithError("Unable to update portfolio category.");
   }
 
@@ -269,9 +426,9 @@ export async function togglePortfolioCategoryPublished(formData: FormData) {
     .maybeSingle();
 
   if (error) {
-  console.error("Portfolio category publication update failed:", error);
-  redirectWithError("Unable to change category publication status.");
-}
+    console.error("Portfolio category publication update failed:", error);
+    redirectWithError("Unable to change category publication status.");
+  }
 
   if (!data) {
     redirectWithError("The category could not be found.");
@@ -297,11 +454,15 @@ export async function deletePortfolioCategory(formData: FormData) {
     .eq("category_id", id);
 
   if (projectCheckError) {
-    redirectWithError("Unable to check projects assigned to this category.");
+    redirectWithError(
+      "Unable to check projects assigned to this category."
+    );
   }
 
   if ((count ?? 0) > 0) {
-    redirectWithError("This category still contains projects. Move or delete those projects before deleting the category.");
+    redirectWithError(
+      "This category still contains projects. Move or delete those projects before deleting the category."
+    );
   }
 
   const { error: deleteError } = await supabase
@@ -311,9 +472,16 @@ export async function deletePortfolioCategory(formData: FormData) {
 
   if (deleteError) {
     if (deleteError.code === "23503") {
-      redirectWithError("This category still has projects assigned to it and cannot be deleted.");
+      redirectWithError(
+        "This category still has projects assigned to it and cannot be deleted."
+      );
     }
-
+console.error("Portfolio category deletion failed:", {
+  code: deleteError.code,
+  message: deleteError.message,
+  details: deleteError.details,
+  hint: deleteError.hint,
+});
     redirectWithError("Unable to delete portfolio category.");
   }
 
@@ -328,12 +496,9 @@ export async function updatePortfolioProject(formData: FormData) {
 
   const id = getText(formData, "id");
   const title = getText(formData, "title");
-  const slug = getText(formData, "slug");
-  const projectNumber = getText(formData, "project_number");
+  const slug = normalizeSlug(title);
   const categoryId = getText(formData, "category_id");
   const shortDescription = getText(formData, "short_description");
-  const fullDetails = getText(formData, "full_details");
-  const displayOrderValue = getText(formData, "display_order");
   const contentValue = getText(formData, "content");
   const removeImage = getText(formData, "remove_image") === "true";
 
@@ -341,33 +506,17 @@ export async function updatePortfolioProject(formData: FormData) {
     redirectWithError("Please complete all required project fields.");
   }
 
-  const displayOrder = Number(displayOrderValue);
+  const parsedContent = parseProjectContent(contentValue);
 
-  if (!Number.isInteger(displayOrder) || displayOrder < 0) {
-    redirectWithError("Project display order must be a whole number of zero or greater.");
-  }
-
-  let content: Record<string, unknown>;
-
-  try {
-    const parsed: unknown = contentValue ? JSON.parse(contentValue) : {};
-
-    if (
-      typeof parsed !== "object" ||
-      parsed === null ||
-      Array.isArray(parsed)
-    ) {
-      redirectWithError("Invalid project details format.");
-    }
-
-    content = parsed as Record<string, unknown>;
-  } catch {
+  if (!parsedContent) {
     redirectWithError("Invalid project details format.");
   }
 
+  const content = normalizeProjectContent(parsedContent, slug);
+
   const { data: existingProject, error: existingError } = await supabase
     .from("portfolio_projects")
-    .select("id, image_path")
+    .select("id, image_path, category_id")
     .eq("id", id)
     .maybeSingle();
 
@@ -385,28 +534,29 @@ export async function updatePortfolioProject(formData: FormData) {
     redirectWithError("Please select a valid category.");
   }
 
+  const categoryChanged = existingProject.category_id !== categoryId;
+
+  let displayOrder: number | null = null;
+
+  if (categoryChanged) {
+    displayOrder = await getNextProjectOrder(supabase, categoryId);
+
+    if (displayOrder === null) {
+      redirectWithError("Unable to determine the destination project order.");
+    }
+  }
+
   const image = formData.get("image");
   let newImagePath: string | null = null;
 
   if (image instanceof File && image.size > 0) {
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const imageError = validateProjectImage(image);
 
-    if (!allowedTypes.includes(image.type)) {
-      redirectWithError("Only JPEG, PNG, and WebP images are allowed.");
+    if (imageError) {
+      redirectWithError(imageError);
     }
 
-    if (image.size > 10 * 1024 * 1024) {
-      redirectWithError("Image must not exceed 10MB.");
-    }
-
-    const extension =
-      image.type === "image/jpeg"
-        ? "jpg"
-        : image.type === "image/png"
-          ? "png"
-          : "webp";
-
-    newImagePath = `${crypto.randomUUID()}.${extension}`;
+    newImagePath = `${crypto.randomUUID()}.${getImageExtension(image)}`;
 
     const { error: uploadError } = await supabase.storage
       .from("portfolio-images")
@@ -416,6 +566,7 @@ export async function updatePortfolioProject(formData: FormData) {
       });
 
     if (uploadError) {
+      console.error("Portfolio replacement image upload failed:", uploadError);
       redirectWithError("Unable to upload replacement project image.");
     }
   }
@@ -426,18 +577,21 @@ export async function updatePortfolioProject(formData: FormData) {
       ? null
       : existingProject.image_path;
 
+  const updateValues: Record<string, unknown> = {
+    title,
+    slug,
+    category_id: categoryId,
+    image_path: imagePath,
+    short_description: shortDescription,
+  };
+
+  if (categoryChanged && displayOrder !== null) {
+    updateValues.display_order = displayOrder;
+  }
+
   const { error: updateError } = await supabase
     .from("portfolio_projects")
-    .update({
-      title,
-      slug,
-      project_number: projectNumber || null,
-      category_id: categoryId,
-      image_path: imagePath,
-      short_description: shortDescription,
-      full_details: fullDetails,
-      display_order: displayOrder,
-    })
+    .update(updateValues)
     .eq("id", id);
 
   if (updateError) {
@@ -465,16 +619,46 @@ export async function updatePortfolioProject(formData: FormData) {
 
   if (detailsError) {
     console.error("Portfolio project details update failed:", detailsError);
-    redirectWithError("Project information was updated, but its display content could not be saved.");
+    redirectWithError(
+      "Project information was updated, but its display content could not be saved."
+    );
   }
 
-  if (
-    existingProject.image_path &&
-    (newImagePath || removeImage)
-  ) {
-    await supabase.storage
+  if (existingProject.image_path && (newImagePath || removeImage)) {
+    const { error: imageRemovalError } = await supabase.storage
       .from("portfolio-images")
       .remove([existingProject.image_path]);
+
+    if (imageRemovalError) {
+      console.error(
+        "Unable to remove the previous portfolio image:",
+        imageRemovalError
+      );
+    }
+  }
+
+  if (categoryChanged) {
+    const sourceSynchronized = await synchronizeCategoryProjects(
+      supabase,
+      existingProject.category_id
+    );
+
+    if (!sourceSynchronized) {
+      console.error(
+        "Unable to synchronize project numbering in the source category."
+      );
+    }
+  }
+
+  const destinationSynchronized = await synchronizeCategoryProjects(
+    supabase,
+    categoryId
+  );
+
+  if (!destinationSynchronized) {
+    console.error(
+      "Unable to synchronize project numbering in the destination category."
+    );
   }
 
   revalidatePortfolio();
@@ -526,7 +710,7 @@ export async function deletePortfolioProject(formData: FormData) {
 
   const { data: project, error: projectError } = await supabase
     .from("portfolio_projects")
-    .select("id, image_path")
+    .select("id, image_path, category_id")
     .eq("id", id)
     .maybeSingle();
 
@@ -564,6 +748,239 @@ export async function deletePortfolioProject(formData: FormData) {
     }
   }
 
+  const synchronized = await synchronizeCategoryProjects(
+    supabase,
+    project.category_id
+  );
+
+  if (!synchronized) {
+    console.error(
+      "Unable to synchronize project numbering after project deletion."
+    );
+  }
+
   revalidatePortfolio();
   redirect("/akiv-base/admin/portfolio?projectDeleted=1");
+}
+
+export async function reorderPortfolioProjects(
+  categoryId: string,
+  projectIds: string[]
+): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+
+  if (
+    !categoryId?.trim() ||
+    !Array.isArray(projectIds) ||
+    projectIds.some((id) => typeof id !== "string" || !id.trim())
+  ) {
+    return {
+      success: false,
+      error: "Invalid project order.",
+    };
+  }
+
+  const uniqueIds = [...new Set(projectIds)];
+
+  if (uniqueIds.length !== projectIds.length) {
+    return {
+      success: false,
+      error: "The project order contains duplicate entries.",
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { data: currentProjects, error: fetchError } = await supabase
+    .from("portfolio_projects")
+    .select("id, display_order, project_number")
+    .eq("category_id", categoryId)
+    .order("display_order", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (fetchError || !currentProjects) {
+    console.error("Unable to retrieve portfolio project order:", fetchError);
+
+    return {
+      success: false,
+      error: "Unable to retrieve the current project order.",
+    };
+  }
+
+  const currentIds = new Set(
+    currentProjects.map((project) => project.id)
+  );
+
+  if (
+    uniqueIds.length !== currentProjects.length ||
+    uniqueIds.some((id) => !currentIds.has(id))
+  ) {
+    return {
+      success: false,
+      error: "The project list has changed. Refresh and try again.",
+    };
+  }
+
+  const unchanged = uniqueIds.every(
+    (id, index) => id === currentProjects[index]?.id
+  );
+
+  if (unchanged) {
+    return { success: true };
+  }
+
+  for (let index = 0; index < uniqueIds.length; index++) {
+    const { data, error } = await supabase
+      .from("portfolio_projects")
+      .update({
+        display_order: index + 1,
+        project_number: formatProjectNumber(index),
+      })
+      .eq("id", uniqueIds[index])
+      .eq("category_id", categoryId)
+      .select("id")
+      .maybeSingle();
+
+    if (error || !data) {
+      console.error("Unable to reorder portfolio projects:", error);
+
+      for (const original of currentProjects) {
+        const { error: rollbackError } = await supabase
+          .from("portfolio_projects")
+          .update({
+            display_order: original.display_order,
+            project_number: original.project_number,
+          })
+          .eq("id", original.id)
+          .eq("category_id", categoryId);
+
+        if (rollbackError) {
+          console.error(
+            "Unable to restore portfolio project order:",
+            rollbackError
+          );
+        }
+      }
+
+      return {
+        success: false,
+        error: "Unable to save the new project order. Please try again.",
+      };
+    }
+  }
+
+  revalidatePortfolio();
+
+  return { success: true };
+}
+
+/**
+ * Reorders portfolio categories.
+ * The submitted IDs must match every existing category exactly once.
+ * Project records and their category assignments are not modified.
+ */
+export async function reorderPortfolioCategories(
+  categoryIds: string[]
+): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+
+  if (
+    !Array.isArray(categoryIds) ||
+    categoryIds.some(
+      (id) => typeof id !== "string" || !id.trim()
+    )
+  ) {
+    return {
+      success: false,
+      error: "Invalid category order.",
+    };
+  }
+
+  const uniqueIds = [...new Set(categoryIds)];
+
+  if (uniqueIds.length !== categoryIds.length) {
+    return {
+      success: false,
+      error: "The category order contains duplicate entries.",
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { data: currentCategories, error: fetchError } = await supabase
+    .from("portfolio_categories")
+    .select("id, display_order")
+    .order("display_order", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (fetchError || !currentCategories) {
+    console.error("Unable to retrieve portfolio category order:", fetchError);
+
+    return {
+      success: false,
+      error: "Unable to retrieve the current category order.",
+    };
+  }
+
+  const currentIds = new Set(
+    currentCategories.map((category) => category.id)
+  );
+
+  if (
+    uniqueIds.length !== currentCategories.length ||
+    uniqueIds.some((id) => !currentIds.has(id))
+  ) {
+    return {
+      success: false,
+      error: "The category list has changed. Refresh and try again.",
+    };
+  }
+
+  const unchanged = uniqueIds.every(
+    (id, index) => id === currentCategories[index]?.id
+  );
+
+  if (unchanged) {
+    return { success: true };
+  }
+
+  for (let index = 0; index < uniqueIds.length; index++) {
+    const { data, error } = await supabase
+      .from("portfolio_categories")
+      .update({
+        display_order: index + 1,
+      })
+      .eq("id", uniqueIds[index])
+      .select("id")
+      .maybeSingle();
+
+    if (error || !data) {
+      console.error("Unable to reorder portfolio categories:", error);
+
+      for (const original of currentCategories) {
+        const { error: rollbackError } = await supabase
+          .from("portfolio_categories")
+          .update({
+            display_order: original.display_order,
+          })
+          .eq("id", original.id);
+
+        if (rollbackError) {
+          console.error(
+            "Unable to restore portfolio category order:",
+            rollbackError
+          );
+        }
+      }
+
+      return {
+        success: false,
+        error: "Unable to save the new category order. Please try again.",
+      };
+    }
+  }
+
+  revalidatePortfolio();
+
+  return { success: true };
 }

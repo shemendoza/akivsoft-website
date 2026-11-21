@@ -1,7 +1,42 @@
 
 "use client";
 
-import { Gamepad2, Globe, Smartphone } from "lucide-react";
+import {
+  BookOpen,
+  Brain,
+  BriefcaseBusiness,
+  Calculator,
+  CalendarDays,
+  Camera,
+  Cloud,
+  Code2,
+  Compass,
+  Cpu,
+  Database,
+  Gamepad2,
+  Globe,
+  GraduationCap,
+  HeartPulse,
+  Image,
+  Laptop,
+  Layers,
+  LayoutDashboard,
+  Map as MapIcon,
+  MessageCircle,
+  Monitor,
+  Music2,
+  Palette,
+  Puzzle,
+  Rocket,
+  ShoppingCart,
+  Smartphone,
+  Sparkles,
+  Tablet,
+  Terminal,
+  Wallet,
+  Wrench,
+  Zap,
+} from "lucide-react";
 import type { ElementType } from "react";
 
 import PortfolioCarousel from "@/components/PortfolioCarousel";
@@ -22,8 +57,39 @@ type PortfolioSectionsProps = {
 
 const iconMap: Record<string, ElementType> = {
   Gamepad2,
-  Globe,
   Smartphone,
+  Globe,
+  Monitor,
+  Laptop,
+  Tablet,
+  Code2,
+  Layers,
+  Brain,
+  BookOpen,
+  BriefcaseBusiness,
+  Calculator,
+  CalendarDays,
+  Camera,
+  Cloud,
+  Compass,
+  Cpu,
+  Database,
+  GraduationCap,
+  HeartPulse,
+  Image,
+  LayoutDashboard,
+  Map: MapIcon,
+  MessageCircle,
+  Music2,
+  Palette,
+  Puzzle,
+  Rocket,
+  ShoppingCart,
+  Sparkles,
+  Terminal,
+  Wallet,
+  Wrench,
+  Zap,
 };
 
 const DEFAULT_GRADIENT = "from-[#3B4895] to-[#DE8A61]";
@@ -93,10 +159,10 @@ export default function PortfolioSections({
                 <span className="pixel-dot" />
 
                 <h3
-  className={`font-ethnocentric text-xl font-normal tracking-[0.02em] text-[#F0CA77] ${
-    categoryIndex === 0 ? "sm:text-4xl" : "sm:text-3xl"
-  }`}
->
+                  className={`font-ethnocentric text-xl font-normal tracking-[0.02em] text-[#F0CA77] ${
+                    categoryIndex === 0 ? "sm:text-4xl" : "sm:text-3xl"
+                  }`}
+                >
                   {category.section_title}
                 </h3>
               </div>

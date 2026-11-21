@@ -701,18 +701,8 @@ export default function PortfolioCarousel({
                   className="relative z-50 w-full max-w-[780px]"
                   aria-label={
                     item.title
-                      ? item.title +
-                        " " +
-                        (item.kind === "App"
-                          ? "application"
-                          : item.kind === "Web"
-                            ? "website"
-                            : "game") +
-                        " details"
-                      : (item.kind ?? "Game") +
-                        " " +
-                        item.number +
-                        ", coming soon"
+                      ? item.title + " project details"
+                      : `Project ${item.number}, ${item.availability}`
                   }
                 >
                   <div
@@ -748,7 +738,7 @@ export default function PortfolioCarousel({
                             <div className="relative z-10">
                               <div className="mb-6 flex flex-wrap items-center gap-3">
                                 <span className="font-[var(--font-rajdhani)] text-[10px] tracking-[0.24em] text-white/55">
-                                  {item.kind ?? "Game"} {item.number}
+                                  PROJECT {item.number}
                                 </span>
 
                                 <span className="inline-flex items-center gap-2 rounded-full bg-[#F0CA77]/10 px-3 py-1.5 font-[var(--font-rajdhani)] text-[10px] tracking-[0.16em] text-[#F0CA77]">
@@ -897,11 +887,11 @@ export default function PortfolioCarousel({
 
                                         <div>
                                           <p className="font-[var(--font-rajdhani)] text-[9px] tracking-[0.2em] text-white/35">
-                                            Game data
+                                            Project data
                                           </p>
 
                                           <h4 className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.2em] text-white/80">
-                                            Genre
+                                            Primary Genre
                                           </h4>
                                         </div>
 
@@ -923,11 +913,11 @@ export default function PortfolioCarousel({
 
                                         <div>
                                           <p className="font-[var(--font-rajdhani)] text-[9px] tracking-[0.2em] text-white/35">
-                                            Gameplay tags
+                                            Additional categories
                                           </p>
 
                                           <h4 className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.2em] text-white/80">
-                                            Secondary
+                                            Secondary Genres
                                           </h4>
                                         </div>
 
@@ -957,7 +947,7 @@ export default function PortfolioCarousel({
 
                                       <div>
                                         <p className="font-[var(--font-rajdhani)] text-[9px] tracking-[0.2em] text-white/35">
-                                          App details
+                                          Project details
                                         </p>
 
                                         <h4 className="font-[var(--font-rajdhani)] text-xs font-semibold tracking-[0.2em] text-white/80">
@@ -994,10 +984,6 @@ export default function PortfolioCarousel({
 
                                   <p className="pt-3 font-ethnocentric text-xs font-normal tracking-[0.18em] text-white/75 sm:text-sm">
                                     {item.closing.brand}
-                                  </p>
-
-                                  <p className="font-[var(--font-rajdhani)] text-sm font-semibold tracking-[0.18em] text-[#DE8A61]">
-                                    {item.closing.tagline}
                                   </p>
                                 </div>
                               )}
@@ -1124,7 +1110,7 @@ export default function PortfolioCarousel({
 
                     selectCard(index);
                   }}
-                  aria-label={`Select ${item.title || `game ${item.number}`}`}
+                  aria-label={`Select ${item.title || `project ${item.number}`}`}
                   className="
                     group
                     block

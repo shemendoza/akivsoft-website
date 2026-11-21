@@ -15,28 +15,26 @@ type ServicesPageProps = {
 };
 
 const SUCCESS_MESSAGES: Record<string, string> = {
-  sectionCreated: "Service section created successfully.",
-  sectionUpdated: "Service section updated successfully.",
-  sectionPublished: "Section publication status updated.",
-  sectionDeleted: "Service section deleted successfully.",
-  serviceCreated: "Service created successfully.",
+  sectionCreated: "Service category created successfully as a draft.",
+  sectionUpdated: "Service category updated successfully.",
+  sectionPublished: "Category publication status updated.",
+  sectionDeleted: "Service category deleted successfully.",
+  serviceCreated: "Service created successfully as a draft.",
   serviceUpdated: "Service updated successfully.",
   servicePublished: "Service publication status updated.",
   serviceDeleted: "Service deleted successfully.",
-  contentBlockCreated: "Service content block created successfully.",
-  contentBlockUpdated: "Service content block updated successfully.",
-  contentBlockPublished: "Content block publication status updated.",
-  contentBlockDeleted: "Service content block deleted successfully.",
+  contentBlockCreated:
+    "Additional content block created successfully as a draft.",
+  contentBlockUpdated: "Additional content block updated successfully.",
+  contentBlockPublished:
+    "Additional content block publication status updated.",
+  contentBlockDeleted: "Additional content block deleted successfully.",
 };
 
 export default async function AdminServicesPage({
   searchParams,
 }: ServicesPageProps) {
-  const [
-    { sections, services },
-    contentBlocks,
-    params,
-  ] = await Promise.all([
+  const [{ sections, services }, contentBlocks, params] = await Promise.all([
     getAdminServices(),
     getAdminServiceContentBlocks(),
     searchParams,
@@ -49,6 +47,12 @@ export default async function AdminServicesPage({
   const publishedServices = services.filter(
     (service) => service.is_published
   ).length;
+
+  const draftSectionCount = sections.length - publishedSections;
+  const draftServiceCount = services.length - publishedServices;
+
+  // Every unpublished category and individual service counts as a draft.
+  const draftServices = draftSectionCount + draftServiceCount;
 
   const successMessage = params.success
     ? SUCCESS_MESSAGES[params.success]
@@ -72,17 +76,13 @@ export default async function AdminServicesPage({
         </div>
 
         <header className="mb-10">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#DE8A61]">
-            AKIVSOFT Administration
-          </p>
-
-          <h1 className="font-ethnocentric text-2xl text-[#F0CA77] sm:text-3xl">
+          <h1 className="font-ethnocentric text-xl text-[#F0CA77] sm:text-2xl">
             Services Management
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#C5BFD0]">
-            Manage the service sections and individual services displayed on
-            your website. Changes here are independent of Portfolio Management.
+            Manage your service categories, organize individual services,
+            and control the content displayed on your website.
           </p>
         </header>
 
@@ -98,41 +98,59 @@ export default async function AdminServicesPage({
           </div>
         )}
 
-        <section className="mb-8 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-[#15162D]/80 p-5 backdrop-blur-xl">
-            <p className="text-xs uppercase tracking-wider text-[#C5BFD0]">
-              Total Sections
-            </p>
-            <p className="mt-3 font-ethnocentric text-3xl text-[#F0CA77]">
-              {sections.length}
-            </p>
-            <p className="mt-2 text-xs text-[#C5BFD0]">
-              {publishedSections} published
-            </p>
-          </div>
+        <section className="mb-10">
+          <h2 className="mb-5 font-ethnocentric text-sm text-[#FFFDF8]">
+            Services Overview
+          </h2>
 
-          <div className="rounded-2xl border border-white/10 bg-[#15162D]/80 p-5 backdrop-blur-xl">
-            <p className="text-xs uppercase tracking-wider text-[#C5BFD0]">
-              Total Services
-            </p>
-            <p className="mt-3 font-ethnocentric text-3xl text-[#DE8A61]">
-              {services.length}
-            </p>
-            <p className="mt-2 text-xs text-[#C5BFD0]">
-              {publishedServices} published
-            </p>
-          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-2xl border border-white/10 bg-[#15162D]/80 p-6 backdrop-blur-xl">
+              <p className="text-sm text-[#C5BFD0]">
+                Total Categories
+              </p>
+              <p className="mt-3 font-ethnocentric text-3xl text-[#F0CA77]">
+                {sections.length}
+              </p>
+              <p className="mt-2 text-xs text-[#C5BFD0]">
+                {publishedSections} published
+              </p>
+            </div>
 
-          <div className="rounded-2xl border border-white/10 bg-[#15162D]/80 p-5 backdrop-blur-xl">
-            <p className="text-xs uppercase tracking-wider text-[#C5BFD0]">
-              Draft Services
-            </p>
-            <p className="mt-3 font-ethnocentric text-3xl text-[#C59DD3]">
-              {services.length - publishedServices}
-            </p>
-            <p className="mt-2 text-xs text-[#C5BFD0]">
-              Not currently published
-            </p>
+            <div className="rounded-2xl border border-white/10 bg-[#15162D]/80 p-6 backdrop-blur-xl">
+              <p className="text-sm text-[#C5BFD0]">
+                Total Services
+              </p>
+              <p className="mt-3 font-ethnocentric text-3xl text-[#DE8A61]">
+                {services.length}
+              </p>
+              <p className="mt-2 text-xs text-[#C5BFD0]">
+                {publishedServices} published
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-[#15162D]/80 p-6 backdrop-blur-xl">
+              <p className="text-sm text-[#C5BFD0]">
+                Draft Services
+              </p>
+              <p className="mt-3 font-ethnocentric text-3xl text-[#C59DD3]">
+                {draftServices}
+              </p>
+              <p className="mt-2 text-xs text-[#C5BFD0]">
+                Includes unpublished categories and services
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-[#15162D]/80 p-6 backdrop-blur-xl">
+              <p className="text-sm text-[#C5BFD0]">
+                Total Content
+              </p>
+              <p className="mt-3 font-ethnocentric text-3xl text-[#3B4895]">
+                {contentBlocks.length}
+              </p>
+              <p className="mt-2 text-xs text-[#C5BFD0]">
+                Additional content blocks
+              </p>
+            </div>
           </div>
         </section>
 

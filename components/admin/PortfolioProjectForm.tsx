@@ -1,11 +1,11 @@
+
 "use client";
 
 import { useState } from "react";
 
 import { createPortfolioProject } from "@/app/akiv-base/admin/portfolio/actions";
 import PendingSubmitButton from "@/components/admin/PendingSubmitButton";
-import type { PortfolioCategoryRecord } from "@/types/portfolio";
-
+import { Check } from "lucide-react";
 type Feature = {
   icon: string;
   title: string;
@@ -13,7 +13,6 @@ type Feature = {
 };
 
 type ProjectContent = {
-  kind: "Game" | "App" | "Web";
   category: string;
   tagline: string;
   detailsId: string;
@@ -30,13 +29,91 @@ type ProjectContent = {
     prompt: string;
     subline: string;
     brand: string;
-    tagline: string;
   };
 };
 
 type PortfolioProjectFormProps = {
-  categories: PortfolioCategoryRecord[];
+  categoryId: string;
+  categoryName: string;
+  onCancel?: () => void;
 };
+
+const GENRE_OPTIONS = [
+  "Action",
+  "Adventure",
+  "Arcade",
+  "Casual",
+  "Educational",
+  "Fighting",
+  "Horror",
+  "Music & Rhythm",
+  "Platformer",
+  "Puzzle",
+  "Racing",
+  "Role-Playing (RPG)",
+  "Simulation",
+  "Sports",
+  "Strategy",
+  "Survival",
+  "Productivity",
+  "Finance",
+  "Health & Fitness",
+  "Lifestyle",
+  "Entertainment",
+  "Social",
+  "Communication",
+  "E-commerce",
+  "Business",
+  "Portfolio",
+  "Blog",
+  "News",
+  "Travel",
+  "Utilities",
+  "Other",
+] as const;
+
+const PLATFORM_OPTIONS = [
+  "Mobile",
+  "PC/Desktop",
+  "Web",
+] as const;
+
+const DISPLAY_ICON_OPTIONS = [
+  { value: "Gamepad2", label: "Gamepad — Games" },
+  { value: "Smartphone", label: "Smartphone — Mobile Applications" },
+  { value: "Globe", label: "Globe — Websites / Web Projects" },
+  { value: "Monitor", label: "Monitor — Desktop Software" },
+  { value: "Laptop", label: "Laptop — Computer Applications" },
+  { value: "Tablet", label: "Tablet — Tablet Applications" },
+  { value: "Code2", label: "Code — Development" },
+  { value: "Layers", label: "Layers — Platforms / Systems" },
+  { value: "Brain", label: "Brain — Artificial Intelligence" },
+  { value: "BookOpen", label: "Book — Education / Learning" },
+  { value: "BriefcaseBusiness", label: "Briefcase — Business" },
+  { value: "Calculator", label: "Calculator — Finance / Tools" },
+  { value: "CalendarDays", label: "Calendar — Scheduling" },
+  { value: "Camera", label: "Camera — Photography" },
+  { value: "Cloud", label: "Cloud — Cloud Services" },
+  { value: "Compass", label: "Compass — Navigation" },
+  { value: "Cpu", label: "CPU — Technology" },
+  { value: "Database", label: "Database — Data Management" },
+  { value: "GraduationCap", label: "Graduation Cap — Education" },
+  { value: "HeartPulse", label: "Heart — Health / Fitness" },
+  { value: "Image", label: "Image — Media / Graphics" },
+  { value: "LayoutDashboard", label: "Dashboard — Admin / Analytics" },
+  { value: "Map", label: "Map — Maps / Location" },
+  { value: "MessageCircle", label: "Message — Communication" },
+  { value: "Music2", label: "Music — Audio / Music" },
+  { value: "Palette", label: "Palette — Design / Art" },
+  { value: "Puzzle", label: "Puzzle — Problem Solving" },
+  { value: "Rocket", label: "Rocket — Innovation / Launch" },
+  { value: "ShoppingCart", label: "Shopping Cart — E-commerce" },
+  { value: "Sparkles", label: "Sparkles — Creative Projects" },
+  { value: "Terminal", label: "Terminal — Developer Tools" },
+  { value: "Wallet", label: "Wallet — Money / Payments" },
+  { value: "Wrench", label: "Wrench — Tools / Utilities" },
+  { value: "Zap", label: "Zap — Performance / Energy" },
+] as const;
 
 const FEATURE_ICON_OPTIONS = [
   { value: "✨", label: "✨ General Feature" },
@@ -44,6 +121,7 @@ const FEATURE_ICON_OPTIONS = [
   { value: "🛡️", label: "🛡️ Protection / Security" },
   { value: "⚡", label: "⚡ Speed / Power" },
   { value: "🎮", label: "🎮 Gameplay" },
+  { value: "🕹️", label: "🕹️ Controls / Gaming" },
   { value: "🌌", label: "🌌 Space / Exploration" },
   { value: "❤️", label: "❤️ Lives / Health" },
   { value: "🏆", label: "🏆 Achievement" },
@@ -51,13 +129,40 @@ const FEATURE_ICON_OPTIONS = [
   { value: "💡", label: "💡 Ideas / Innovation" },
   { value: "🔒", label: "🔒 Privacy / Security" },
   { value: "📱", label: "📱 Mobile" },
+  { value: "💻", label: "💻 Desktop / Computing" },
+  { value: "🌐", label: "🌐 Online / Web" },
   { value: "🎨", label: "🎨 Design / Creativity" },
   { value: "☁️", label: "☁️ Cloud / Online" },
   { value: "🔥", label: "🔥 Intensity" },
+  { value: "💎", label: "💎 Premium / Special" },
+  { value: "🪙", label: "🪙 Coins / Currency" },
+  { value: "🧲", label: "🧲 Magnet / Collection" },
+  { value: "🎯", label: "🎯 Goals / Accuracy" },
+  { value: "🧠", label: "🧠 Intelligence / Logic" },
+  { value: "🧩", label: "🧩 Puzzles / Challenges" },
+  { value: "🎵", label: "🎵 Music / Audio" },
+  { value: "📚", label: "📚 Learning / Content" },
+  { value: "🔔", label: "🔔 Notifications" },
+  { value: "🤖", label: "🤖 Automation / AI" },
+  { value: "🗺️", label: "🗺️ Maps / Locations" },
+  { value: "🏁", label: "🏁 Racing / Completion" },
+  { value: "🎲", label: "🎲 Random / Chance" },
+  { value: "⚙️", label: "⚙️ Settings / Configuration" },
+  { value: "🛠️", label: "🛠️ Tools / Customization" },
+  { value: "📈", label: "📈 Growth / Progress" },
+  { value: "📊", label: "📊 Statistics / Analytics" },
+  { value: "💬", label: "💬 Communication" },
+  { value: "🔍", label: "🔍 Search / Discovery" },
+  { value: "📦", label: "📦 Inventory / Storage" },
+  { value: "♻️", label: "♻️ Sustainability / Recycling" },
+  { value: "🌟", label: "🌟 Highlights / Rewards" },
+  { value: "🔑", label: "🔑 Access / Authentication" },
+  { value: "📷", label: "📷 Camera / Capture" },
+  { value: "⏱️", label: "⏱️ Time / Timer" },
+  { value: "🌈", label: "🌈 Themes / Customization" },
 ] as const;
 
 const DEFAULT_CONTENT: ProjectContent = {
-  kind: "App",
   category: "",
   tagline: "",
   detailsId: "",
@@ -74,7 +179,6 @@ const DEFAULT_CONTENT: ProjectContent = {
     prompt: "",
     subline: "",
     brand: "",
-    tagline: "",
   },
 };
 
@@ -86,6 +190,9 @@ const labelClass = "mb-2 block text-sm text-[#FFFDF8]";
 const sectionClass =
   "space-y-5 rounded-xl border border-white/10 bg-[#0D1023]/50 p-5";
 
+const checkboxClass =
+  "h-4 w-4 shrink-0 accent-[#DE8A61]";
+
 function splitLines(value: string) {
   return value
     .split("\n")
@@ -93,10 +200,28 @@ function splitLines(value: string) {
     .filter(Boolean);
 }
 
+function normalizeSlug(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function PortfolioProjectForm({
-  categories,
+  categoryId,
+  categoryName,
+  onCancel,
 }: PortfolioProjectFormProps) {
   const [content, setContent] = useState<ProjectContent>(DEFAULT_CONTENT);
+  const [title, setTitle] = useState("");
+
+  const generatedSlug = normalizeSlug(title);
+  const generatedDetailsId = generatedSlug
+    ? `${generatedSlug}-details`
+    : "";
 
   function updateContent<K extends keyof ProjectContent>(
     key: K,
@@ -116,6 +241,23 @@ export default function PortfolioProjectForm({
         [key]: value,
       },
     }));
+  }
+
+  function toggleArrayValue(
+    key: "secondaryGenres" | "platforms",
+    value: string,
+    checked: boolean
+  ) {
+    setContent((current) => {
+      const currentValues = current[key];
+
+      return {
+        ...current,
+        [key]: checked
+          ? [...currentValues.filter((item) => item !== value), value]
+          : currentValues.filter((item) => item !== value),
+      };
+    });
   }
 
   function updateFeature(
@@ -157,10 +299,13 @@ export default function PortfolioProjectForm({
       action={createPortfolioProject}
       className="space-y-8 rounded-2xl border border-white/10 bg-[#15162D]/80 p-6 backdrop-blur-xl sm:p-8"
     >
+      <input type="hidden" name="category_id" value={categoryId} />
+
       <div>
         <h3 className="font-ethnocentric text-base text-[#F0CA77]">
           Add New Project
         </h3>
+
         <p className="mt-2 text-sm text-[#C5BFD0]">
           Create a portfolio project using the fields below. New projects are
           saved as unpublished drafts.
@@ -172,8 +317,9 @@ export default function PortfolioProjectForm({
           <h4 className="font-semibold text-[#F0CA77]">
             Basic Information
           </h4>
+
           <p className="mt-1 text-xs text-[#8F8AA3]">
-            The main information used to identify and organize this project.
+            Project numbers and URL identifiers are generated automatically.
           </p>
         </div>
 
@@ -182,90 +328,66 @@ export default function PortfolioProjectForm({
             <label htmlFor="title" className={labelClass}>
               Project Title <span className="text-[#DE8A61]">*</span>
             </label>
+
             <input
               id="title"
               name="title"
               type="text"
               required
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
               placeholder="e.g. Cosmic Shunner"
               className={inputClass}
             />
           </div>
 
           <div>
-            <label htmlFor="project_number" className={labelClass}>
-              Project Number
-            </label>
-            <input
-              id="project_number"
-              name="project_number"
-              type="text"
-              placeholder="e.g. 01"
-              className={inputClass}
-            />
+            <span className={labelClass}>Portfolio Category</span>
+
+            <div className={`${inputClass} flex items-center`}>
+              {categoryName}
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="slug" className={labelClass}>
-              URL Slug <span className="text-[#DE8A61]">*</span>
-            </label>
-            <input
-              id="slug"
-              name="slug"
-              type="text"
-              required
-              pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-              title="Use lowercase letters, numbers, and hyphens only."
-              placeholder="e.g. cosmic-shunner"
-              className={inputClass}
-            />
-            <p className="mt-2 text-xs text-[#8F8AA3]">
-              Use lowercase letters, numbers, and hyphens.
+          <div className="sm:col-span-2 rounded-xl border border-white/10 bg-[#15162D]/70 p-4">
+            <p className="text-xs font-semibold text-[#F0CA77]">
+              Automatically Generated Identifiers
             </p>
-          </div>
 
-          <div>
-            <label htmlFor="category_id" className={labelClass}>
-              Portfolio Category <span className="text-[#DE8A61]">*</span>
-            </label>
-            <select
-              id="category_id"
-              name="category_id"
-              required
-              defaultValue=""
-              className={inputClass}
-            >
-              <option value="" disabled>
-                Select a category
-              </option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2">
+              <div>
+                <span className="block text-xs text-[#8F8AA3]">
+                  URL Slug
+                </span>
 
-          <div>
-            <label htmlFor="display_order" className={labelClass}>
-              Display Order <span className="text-[#DE8A61]">*</span>
-            </label>
-            <input
-              id="display_order"
-              name="display_order"
-              type="number"
-              min="0"
-              step="1"
-              defaultValue="1"
-              required
-              className={inputClass}
-            />
+                <p className="mt-1 break-all text-sm text-[#FFFDF8]">
+                  {generatedSlug || "Enter a project title"}
+                </p>
+              </div>
+
+              <div>
+                <span className="block text-xs text-[#8F8AA3]">
+                  Details ID
+                </span>
+
+                <p className="mt-1 break-all text-sm text-[#FFFDF8]">
+                  {generatedDetailsId || "Generated from the project title"}
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-3 text-xs text-[#8F8AA3]">
+              The project number is assigned according to its position in the
+              selected category. These identifiers update automatically when
+              the project title changes.
+            </p>
           </div>
 
           <div>
             <label htmlFor="image" className={labelClass}>
               Project Image
             </label>
+
             <input
               id="image"
               name="image"
@@ -273,6 +395,7 @@ export default function PortfolioProjectForm({
               accept="image/jpeg,image/png,image/webp"
               className="w-full rounded-xl border border-white/10 bg-[#0D1023] px-3 py-2.5 text-sm text-[#C5BFD0] file:mr-3 file:rounded-lg file:border-0 file:bg-[#3B4895] file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
             />
+
             <p className="mt-2 text-xs text-[#8F8AA3]">
               JPEG, PNG, or WebP. Maximum 10 MB.
             </p>
@@ -282,25 +405,13 @@ export default function PortfolioProjectForm({
             <label htmlFor="short_description" className={labelClass}>
               Short Description <span className="text-[#DE8A61]">*</span>
             </label>
+
             <textarea
               id="short_description"
               name="short_description"
               required
               rows={3}
               placeholder="A short introduction for this project."
-              className={`${inputClass} resize-y leading-relaxed`}
-            />
-          </div>
-
-          <div className="sm:col-span-2">
-            <label htmlFor="full_details" className={labelClass}>
-              Full Details
-            </label>
-            <textarea
-              id="full_details"
-              name="full_details"
-              rows={4}
-              placeholder="Additional project information."
               className={`${inputClass} resize-y leading-relaxed`}
             />
           </div>
@@ -312,6 +423,7 @@ export default function PortfolioProjectForm({
           <h4 className="font-semibold text-[#F0CA77]">
             Portfolio Display Content
           </h4>
+
           <p className="mt-1 text-xs text-[#8F8AA3]">
             Content displayed in the project carousel and project details.
           </p>
@@ -319,30 +431,10 @@ export default function PortfolioProjectForm({
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label htmlFor="kind" className={labelClass}>
-              Project Type
-            </label>
-            <select
-              id="kind"
-              value={content.kind}
-              onChange={(event) =>
-                updateContent(
-                  "kind",
-                  event.target.value as "Game" | "App" | "Web"
-                )
-              }
-              className={inputClass}
-            >
-              <option value="Game">Games</option>
-              <option value="App">Application</option>
-              <option value="Web">Website</option>
-            </select>
-          </div>
-
-          <div>
             <label htmlFor="content_category" className={labelClass}>
               Project Label
             </label>
+
             <input
               id="content_category"
               value={content.category}
@@ -358,6 +450,7 @@ export default function PortfolioProjectForm({
             <label htmlFor="tagline" className={labelClass}>
               Tagline
             </label>
+
             <input
               id="tagline"
               value={content.tagline}
@@ -370,39 +463,33 @@ export default function PortfolioProjectForm({
           </div>
 
           <div>
-            <label htmlFor="detailsId" className={labelClass}>
-              Details ID
-            </label>
-            <input
-              id="detailsId"
-              value={content.detailsId}
-              onChange={(event) =>
-                updateContent("detailsId", event.target.value)
-              }
-              placeholder="e.g. cosmic-shunner-details"
-              className={inputClass}
-            />
-          </div>
-
-          <div>
             <label htmlFor="genre" className={labelClass}>
               Primary Genre
             </label>
-            <input
+
+            <select
               id="genre"
               value={content.genre}
               onChange={(event) =>
                 updateContent("genre", event.target.value)
               }
-              placeholder="e.g. Arcade"
               className={inputClass}
-            />
+            >
+              <option value="">Select a primary genre</option>
+
+              {GENRE_OPTIONS.map((genre) => (
+                <option key={genre} value={genre}>
+                  {genre}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label htmlFor="availability" className={labelClass}>
               Availability
             </label>
+
             <select
               id="availability"
               value={content.availability}
@@ -423,6 +510,7 @@ export default function PortfolioProjectForm({
           <label htmlFor="description" className={labelClass}>
             Project Description
           </label>
+
           <textarea
             id="description"
             rows={6}
@@ -435,51 +523,89 @@ export default function PortfolioProjectForm({
             }
             className={`${inputClass} resize-y leading-relaxed`}
           />
+
           <p className="mt-2 text-xs text-[#8F8AA3]">
             Enter each paragraph on a separate line.
           </p>
         </div>
 
+        <div>
+          <span className={labelClass}>Secondary Genres</span>
+
+          <p className="mb-3 text-xs text-[#8F8AA3]">
+            Select all genres that also describe this project.
+          </p>
+
+          <div className="grid gap-3 rounded-xl border border-white/10 bg-[#15162D]/70 p-4 sm:grid-cols-2 lg:grid-cols-3">
+            {GENRE_OPTIONS.map((genre) => (
+              <label
+                key={genre}
+                className="flex cursor-pointer items-center gap-2 text-xs text-[#C5BFD0] transition hover:text-[#FFFDF8]"
+              >
+                <input
+                  type="checkbox"
+                  checked={content.secondaryGenres.includes(genre)}
+                  onChange={(event) =>
+                    toggleArrayValue(
+                      "secondaryGenres",
+                      genre,
+                      event.target.checked
+                    )
+                  }
+                  className={checkboxClass}
+                />
+
+                {genre}
+              </label>
+            ))}
+          </div>
+
+          {content.secondaryGenres.length > 0 && (
+            <p className="mt-3 text-xs text-[#DE8A61]">
+              Selected: {content.secondaryGenres.join(", ")}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <span className={labelClass}>Platforms</span>
+
+          <p className="mb-3 text-xs text-[#8F8AA3]">
+            Select every platform where this project is available or intended
+            to run.
+          </p>
+
+          <div className="grid gap-3 rounded-xl border border-white/10 bg-[#15162D]/70 p-4 sm:grid-cols-3">
+            {PLATFORM_OPTIONS.map((platform) => (
+              <label
+                key={platform}
+                className="flex cursor-pointer items-center gap-2 text-sm text-[#C5BFD0] transition hover:text-[#FFFDF8]"
+              >
+                <input
+                  type="checkbox"
+                  checked={content.platforms.includes(platform)}
+                  onChange={(event) =>
+                    toggleArrayValue(
+                      "platforms",
+                      platform,
+                      event.target.checked
+                    )
+                  }
+                  className={checkboxClass}
+                />
+
+                {platform}
+              </label>
+            ))}
+          </div>
+        </div>
+
         <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="secondaryGenres" className={labelClass}>
-              Secondary Genres
-            </label>
-            <textarea
-              id="secondaryGenres"
-              rows={3}
-              value={content.secondaryGenres.join("\n")}
-              onChange={(event) =>
-                updateContent(
-                  "secondaryGenres",
-                  splitLines(event.target.value)
-                )
-              }
-              placeholder={"Action\nCasual\nSurvival"}
-              className={`${inputClass} resize-y`}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="platforms" className={labelClass}>
-              Platforms
-            </label>
-            <textarea
-              id="platforms"
-              rows={3}
-              value={content.platforms.join("\n")}
-              onChange={(event) =>
-                updateContent("platforms", splitLines(event.target.value))
-              }
-              placeholder={"Android\nWindows\nWeb"}
-              className={`${inputClass} resize-y`}
-            />
-          </div>
-
           <div>
             <label htmlFor="builtWith" className={labelClass}>
               Built With / Technologies
             </label>
+
             <textarea
               id="builtWith"
               rows={3}
@@ -496,6 +622,7 @@ export default function PortfolioProjectForm({
             <label htmlFor="icon" className={labelClass}>
               Display Icon
             </label>
+
             <select
               id="icon"
               value={content.icon}
@@ -504,10 +631,16 @@ export default function PortfolioProjectForm({
               }
               className={inputClass}
             >
-              <option value="Gamepad2">Gamepad2 — Games</option>
-              <option value="Smartphone">Smartphone — Applications</option>
-              <option value="Globe">Globe — Websites</option>
+              {DISPLAY_ICON_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
+
+            <p className="mt-2 text-xs text-[#8F8AA3]">
+              Choose an icon that best represents the project.
+            </p>
           </div>
         </div>
       </section>
@@ -518,11 +651,13 @@ export default function PortfolioProjectForm({
             <h4 className="font-semibold text-[#F0CA77]">
               Project Features
             </h4>
+
             <p className="mt-1 text-xs text-[#8F8AA3]">
               Add the features that explain what makes this project useful or
               distinctive.
             </p>
           </div>
+
           <button
             type="button"
             onClick={addFeature}
@@ -547,6 +682,7 @@ export default function PortfolioProjectForm({
               <h5 className="text-sm font-semibold text-[#FFFDF8]">
                 Feature {index + 1}
               </h5>
+
               <button
                 type="button"
                 onClick={() => removeFeature(index)}
@@ -564,6 +700,7 @@ export default function PortfolioProjectForm({
                 >
                   Feature Icon
                 </label>
+
                 <select
                   id={`feature-icon-${index}`}
                   value={feature.icon || "✨"}
@@ -587,6 +724,7 @@ export default function PortfolioProjectForm({
                 >
                   Feature Title
                 </label>
+
                 <input
                   id={`feature-title-${index}`}
                   value={feature.title}
@@ -605,6 +743,7 @@ export default function PortfolioProjectForm({
                 >
                   Feature Description
                 </label>
+
                 <textarea
                   id={`feature-description-${index}`}
                   rows={2}
@@ -626,6 +765,7 @@ export default function PortfolioProjectForm({
           <h4 className="font-semibold text-[#F0CA77]">
             Appearance
           </h4>
+
           <p className="mt-1 text-xs text-[#8F8AA3]">
             Configure the gradient styling used by the portfolio display.
           </p>
@@ -635,6 +775,7 @@ export default function PortfolioProjectForm({
           <label htmlFor="gradient" className={labelClass}>
             Tailwind Gradient Classes
           </label>
+
           <input
             id="gradient"
             value={content.gradient}
@@ -644,6 +785,7 @@ export default function PortfolioProjectForm({
             placeholder="from-[#3B4895] to-[#DE8A61]"
             className={inputClass}
           />
+
           <p className="mt-2 text-xs text-[#8F8AA3]">
             Example: from-[#3B4895] to-[#DE8A61]
           </p>
@@ -655,6 +797,7 @@ export default function PortfolioProjectForm({
           <h4 className="font-semibold text-[#F0CA77]">
             Closing Section
           </h4>
+
           <p className="mt-1 text-xs text-[#8F8AA3]">
             Optional final message displayed at the end of the project details.
           </p>
@@ -665,6 +808,7 @@ export default function PortfolioProjectForm({
             <label htmlFor="closing-prompt" className={labelClass}>
               Closing Prompt
             </label>
+
             <input
               id="closing-prompt"
               value={content.closing.prompt}
@@ -680,6 +824,7 @@ export default function PortfolioProjectForm({
             <label htmlFor="closing-subline" className={labelClass}>
               Closing Subline
             </label>
+
             <input
               id="closing-subline"
               value={content.closing.subline}
@@ -695,6 +840,7 @@ export default function PortfolioProjectForm({
             <label htmlFor="closing-brand" className={labelClass}>
               Closing Brand
             </label>
+
             <input
               id="closing-brand"
               value={content.closing.brand}
@@ -705,28 +851,21 @@ export default function PortfolioProjectForm({
               className={inputClass}
             />
           </div>
-
-          <div>
-            <label htmlFor="closing-tagline" className={labelClass}>
-              Closing Tagline
-            </label>
-            <input
-              id="closing-tagline"
-              value={content.closing.tagline}
-              onChange={(event) =>
-                updateClosing("tagline", event.target.value)
-              }
-              placeholder="A final project tagline."
-              className={inputClass}
-            />
-          </div>
         </div>
       </section>
 
       <input
         type="hidden"
         name="content"
-        value={JSON.stringify(content)}
+        value={JSON.stringify({
+          ...content,
+          detailsId: generatedDetailsId,
+          closing: {
+            prompt: content.closing.prompt,
+            subline: content.closing.subline,
+            brand: content.closing.brand,
+          },
+        })}
       />
 
       <div className="flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
@@ -734,20 +873,27 @@ export default function PortfolioProjectForm({
           The project will initially be saved as an unpublished draft.
         </p>
 
-        <PendingSubmitButton
-          pendingText="Creating..."
-          disabled={categories.length === 0}
-          className="rounded-xl bg-gradient-to-r from-[#3B4895] to-[#934C60] px-7 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Create Project
-        </PendingSubmitButton>
-      </div>
+        <div className="flex flex-wrap gap-3">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-xl border border-white/15 px-5 py-3 text-sm text-[#C5BFD0] transition hover:border-white/40 hover:text-[#FFFDF8]"
+            >
+              Cancel
+            </button>
+          )}
 
-      {categories.length === 0 && (
-        <p className="text-sm text-[#DE8A61]">
-          Create a portfolio category before adding a project.
-        </p>
-      )}
+          <PendingSubmitButton
+            pendingText="Creating..."
+            disabled={!categoryId}
+            className="inline-flex items-center gap-2 rounded-lg bg-[#DE8A61] px-5 py-3 text-sm font-semibold text-[#15162D] transition hover:bg-[#F0CA77] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <Check size={15} />
+            Create Project
+          </PendingSubmitButton>
+        </div>
+      </div>
     </form>
   );
 }

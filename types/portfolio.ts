@@ -11,7 +11,7 @@ export type PortfolioClosing = {
   prompt: string;
   subline: string;
   brand: string;
-  tagline: string;
+  tagline?: string;
 };
 
 export type PortfolioItem = {
